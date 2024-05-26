@@ -1,6 +1,7 @@
 <template>
   <div class="navbar">
     <div class="navbar-content">
+      <a><b>websynth</b> //</a>
       <a>home</a>
       <a>files</a>
       <a>view</a>
