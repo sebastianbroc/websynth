@@ -10,6 +10,7 @@
 <script setup>
 import {defineProps} from 'vue'
 import {useVueFlow, Handle, Position} from "@vue-flow/core";
+
 const {updateNodeData} = useVueFlow()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
@@ -21,7 +22,7 @@ let updateData = (frequency) => {
 }
 </script>
 <style scoped>
-  span {
-    margin-left: 10px;
-  }
+span {
+  margin-left: 10px;
+}
 </style>

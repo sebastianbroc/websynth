@@ -59,7 +59,8 @@ export default {
   name: 'WorkSpace',
   data() {
     return {
-      vueFlowInstance: null
+      vueFlowInstance: null,
+      moduleList: []
     }
   },
   components: {
@@ -71,10 +72,11 @@ export default {
     setInstance(vueFlowInstance){
       console.log("instance has been set")
       this.vueFlowInstance = vueFlowInstance
+      this.getModules()
     },
     getModules(){
       if(this.vueFlowInstance){
-        return this.vueFlowInstance.getElements
+        this.$emit('updateElements', this.vueFlowInstance.getElements)
       }
     }
   }
