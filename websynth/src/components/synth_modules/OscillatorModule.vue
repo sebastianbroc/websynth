@@ -17,7 +17,6 @@ const {updateNodeData} = useVueFlow()
 const props = defineProps(['id', 'label'])
 
 let updateData = (frequency) => {
-  console.log(frequency)
   updateNodeData(props.id, {frequency})
 }
 </script>

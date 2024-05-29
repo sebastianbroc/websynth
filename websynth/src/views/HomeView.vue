@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <NavBar></NavBar>
-    <button @click="playTone(500)">Ton</button>
+    <!--<button @click="playTone(500)">Ton</button>-->
     <WorkSpace></WorkSpace>
   </div>
 </template>

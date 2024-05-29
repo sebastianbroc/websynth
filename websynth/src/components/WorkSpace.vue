@@ -1,6 +1,6 @@
 <template>
   <div class="workspace">
-    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]">
+    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" @nodesChange="getModules" @pane-ready="setInstance">
       <Background />
       <MiniMap />
       <template #node-oscillator="customNodeProps">
@@ -18,10 +18,9 @@ import {ref, markRaw} from 'vue'
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
 
-console.log(OscillatorModule);
-
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
+  output: markRaw(OutputModule)
 }
 
 const elements = ref([
@@ -58,10 +57,26 @@ import { MiniMap } from '@vue-flow/minimap'
 import '@vue-flow/minimap/dist/style.css'
 export default {
   name: 'WorkSpace',
+  data() {
+    return {
+      vueFlowInstance: null
+    }
+  },
   components: {
     VueFlow,
     MiniMap,
     Background
+  },
+  methods: {
+    setInstance(vueFlowInstance){
+      console.log("instance has been set")
+      this.vueFlowInstance = vueFlowInstance
+    },
+    getModules(){
+      if(this.vueFlowInstance){
+        return this.vueFlowInstance.getElements
+      }
+    }
   }
 }
 </script>
