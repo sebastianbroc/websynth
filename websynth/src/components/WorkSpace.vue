@@ -1,6 +1,6 @@
 <template>
-  <div class="workspace">
-    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" @nodesChange="getModules" @pane-ready="setInstance">
+  <div class="workspace" @drop="onDrop">
+    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" @nodesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
       <MiniMap />
       <template #node-oscillator="customNodeProps">
@@ -10,13 +10,20 @@
         <OutputModule v-bind="customNodeProps" />
       </template>
     </VueFlow>
+    <ModuleBar></ModuleBar>
   </div>
 </template>
 
 <script setup>
-import {ref, markRaw} from 'vue'
+import {ref, markRaw} from 'vue';
+import {useVueFlow} from '@vue-flow/core';
+import useDragAndDrop from '@/mixins/useDnD'
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
+
+const { onConnect, addEdges } = useVueFlow()
+const { onDragOver, onDrop, onDragLeave } = useDragAndDrop()
+onConnect(addEdges)
 
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
@@ -55,6 +62,7 @@ import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { MiniMap } from '@vue-flow/minimap'
 import '@vue-flow/minimap/dist/style.css'
+import ModuleBar from "@/components/ModuleBar.vue";
 export default {
   name: 'WorkSpace',
   data() {
@@ -66,7 +74,8 @@ export default {
   components: {
     VueFlow,
     MiniMap,
-    Background
+    Background,
+    ModuleBar
   },
   methods: {
     setInstance(vueFlowInstance){
@@ -91,6 +100,7 @@ export default {
 @import '@vue-flow/core/dist/theme-default.css';
 
 .workspace {
+  position: relative;
   width: 100%;
   height: 90vh;
 }
