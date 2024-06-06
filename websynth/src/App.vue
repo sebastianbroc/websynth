@@ -9,6 +9,7 @@
   --c-tertiary: #FAEDCD;
   --c-four: #E9EDC9;
   --c-five: #CCD5AE;
+  --c-semitransparent: rgba(0,0,0,0.2);
 }
 
 #app {

@@ -5,11 +5,8 @@
       <aside>
         <div class="description">Modules</div>
         <div class="nodes">
-          <div class="node vue-flow__node-oscillator" :draggable="true" @dragstart="onDragStart($event, 'input')">Oscillator</div>
+          <div class="node vue-flow__node-oscillator" :draggable="true" @dragstart="onDragStart($event, 'oscillator')">Oscillator</div>
 
-          <div class="node vue-flow__node-default" :draggable="true" @dragstart="onDragStart($event, 'default')">Default Node</div>
-
-          <div class="node vue-flow__node-output" :draggable="true" @dragstart="onDragStart($event, 'output')">Output Node</div>
         </div>
       </aside>
     </div>
@@ -41,8 +38,10 @@ export default {
 
 <style lang="scss">
 .modulebar {
+  z-index: 10;
   position: absolute;
-  right: -195px;
+  width: 200px;
+  right: -220px;
   transition: right 0.15s ease-in-out;
   top: 0;
   background: var(--c-five);

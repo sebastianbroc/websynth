@@ -1,16 +1,16 @@
 <template>
   <div class="workspace" @drop="onDrop">
-    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" @nodesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
+    <ModuleBar></ModuleBar>
+    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" @nodesChange="getModules" @edgesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
       <MiniMap />
       <template #node-oscillator="customNodeProps">
-        <OscillatorModule v-bind="customNodeProps" />
+        <OscillatorModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
       <template #node-output="customNodeProps">
         <OutputModule v-bind="customNodeProps" />
       </template>
     </VueFlow>
-    <ModuleBar></ModuleBar>
   </div>
 </template>
 
@@ -37,23 +37,7 @@ const elements = ref([
     type: 'output',
     label: 'Output',
     position: { x: 500, y: 300 }
-  },
-
-  // a custom edge, specified by using a custom type name
-  // we choose `type: 'special'` for this example
-  {
-    id: 'e1-4',
-    type: 'special',
-    source: '3',
-    target: '4',
-    animated: true,
-
-    // pass custom data to the edge
-    data: {
-      // You can pass any data you want to the edge
-      hello: 'world',
-    }
-  },
+  }
 ])
 </script>
 
