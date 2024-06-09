@@ -7,6 +7,9 @@
       <template #node-oscillator="customNodeProps">
         <OscillatorModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
+      <template #node-filter="customNodeProps">
+        <FilterModule v-bind="customNodeProps" @moduleChanged="getModules" />
+      </template>
       <template #node-output="customNodeProps">
         <OutputModule v-bind="customNodeProps" />
       </template>
@@ -20,6 +23,7 @@ import {useVueFlow} from '@vue-flow/core';
 import useDragAndDrop from '@/mixins/useDnD'
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
+import FilterModule from "@/components/synth_modules/FilterModule.vue";
 
 const { onConnect, addEdges } = useVueFlow()
 const { onDragOver, onDrop, onDragLeave } = useDragAndDrop()
@@ -27,7 +31,8 @@ onConnect(addEdges)
 
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
-  output: markRaw(OutputModule)
+  output: markRaw(OutputModule),
+  filter: markRaw(FilterModule)
 }
 
 const elements = ref([

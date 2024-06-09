@@ -2,7 +2,8 @@
   <div class="main">
     <NavBar></NavBar>
     <!--<button @click="playTone(500)">Ton</button>-->
-    <!--<p id="oscList">{{elements}}</p>-->
+    <!--<p id="audioNodeList">{{elements}}</p>-->
+    <p id="audioNodeList">{{audioNodeList}}</p>
     <WorkSpace @updateElements="updateElements"></WorkSpace>
   </div>
 </template>
@@ -22,36 +23,96 @@ export default {
       audioContext: null,
       mainVolume: null,
       elements: null,
-      oscList: []
+      audioNodeList: []
     }
   },
   mounted(){
     this.initAudio();
   },
   methods: {
-    updateElements(value){
-      console.log("updated elements")
-      this.elements = value
-
-      this.elements.forEach(module => {
-        switch(module.type){
-          case 'oscillator':
-            if(module.data.frequency) this.handleOscillator(module.id, module.data.frequency, module.data.waveform)
-        }
-      })
-    },
     initAudio(){
       this.audioContext = new AudioContext();
       this.mainVolume = this.audioContext.createGain();
       this.mainVolume.connect(this.audioContext.destination);
       this.mainVolume.gain.value = 1.0;
     },
+    updateElements(value){
+      this.elements = value
+
+      this.elements.forEach(module => {
+        this.handleNodeList(module)
+        this.buildConnection(module)
+
+
+        /*switch(module.type){
+          case 'oscillator':
+            if(module.data.frequency) this.handleOscillator(module.id, module.data.frequency, module.data.waveform)
+            break;
+          case 'filter':
+            this.buildConnection(module)
+        }*/
+      })
+    },
     getModuleChild(id){
+      //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
       return this.elements.find(m => m.type == "default" && m.sourceNode.id === id)
+    },
+    buildConnection(source){
+      let target = this.getModuleChild(source.id)
+      let audioNode = this.audioNodeList.find(n => n.id === source.id)
+
+
+
+      if (target && !audioNode.connected){
+        if(target.targetNode.type === "output"){
+          audioNode.module.connect(this.mainVolume)
+          audioNode.connected = true
+          console.log("connected to main volume")
+        } else {
+          audioNode.module.connect(target)
+        }
+
+        try{
+          audioNode.module.start()
+        } catch(e){
+          //do nothing
+        }
+      }
+    },
+    handleNodeList(module){
+      if(module.type !== "output" && module.type !== "default"){
+        let Node = this.audioNodeList.find(n => n.id === module.id);
+        if(Node) Node = Node.module
+        let isNewNode = !Node
+
+        switch(module.type){
+          case 'filter':
+            if(!Node) Node = this.audioContext.createBiquadFilter()
+            Node.frequency = module.data.frequency
+            Node.type = module.data.type
+            break;
+          case 'oscillator':
+            if(!Node){
+              Node = this.audioContext.createOscillator()
+              isNewNode = true
+            }
+            if(module.data.frequency){
+              console.log(module.data)
+              Node.frequency.value = module.data.frequency
+              Node.type = module.data.waveform
+              if (isNewNode){
+                Node.start()
+                console.log("started oscillator")
+              }
+            }
+            break;
+        }
+        if(isNewNode) this.audioNodeList.push({"id": module.id, module: Node, connected: false})
+      }
     },
     handleOscillator(id, freq, waveform){
       let presentOscFound = false
-      this.oscList.forEach(osc => {
+      this.audioNodeList.forEach(osc => {
         if(osc.id === id){
           osc.module.frequency.value = freq
           osc.module.type = waveform
@@ -65,7 +126,7 @@ export default {
               osc.module.disconnect(this.mainVolume)
               osc.connected = false
             } catch(e){
-              //disconnection failed, do nothing as it is probably because it is already disconnected
+              //disconnection failed, do nothing as it is likely because it is already disconnected
               osc.connected = false
             }
           }
@@ -81,7 +142,7 @@ export default {
         newOsc.type = waveform;
         newOsc.frequency.value = freq;
         newOsc.start();
-        this.oscList.push({"id": id, module: newOsc, connected: true})
+        this.audioNodeList.push({"id": id, module: newOsc, connected: true})
       }
     }
   }
@@ -93,7 +154,7 @@ export default {
     height: 100vh;
   }
 
-  #oscList {
+  #audioNodeList {
     position: absolute;
     z-index: -10;
     color: rgba(0,0,0,0.2);

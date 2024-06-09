@@ -3,25 +3,27 @@
     <Handle type="target" :position="Position.Top" />
     <Handle type="source" :position="Position.Bottom" />
     <div class="module_label">
-      <h3>Oscillator</h3>
+      <h3>Filter</h3>
       <p>{{ label }}</p>
     </div>
     <div class="controls">
       <div>
-        <input type="text" @input="event => updateFrequency(event.target.value)" value="400"><span>Hz</span>
+        <input type="text" @input="event => updateFrequency(event.target.value)"><span>Hz</span>
       </div>
-      <select @input="event => updateWaveform(event.target.value)">
-        <option value="sine" selected>Sine</option>
-        <option value="sawtooth">Saw</option>
-        <option value="square">Square</option>
-        <option value="triangle">Triangle</option>
+      <select @input="event => updateType(event.target.value)">
+        <option value="lowpass">Low-Pass</option>
+        <option value="highpass">High-Pass</option>
+        <option value="bandpass">Band-Pass</option>
+        <option value="lowshelf">Low-Shelf</option>
+        <option value="highshelf">High-Shelf</option>
+        <option value="notch">Notch</option>
       </select>
     </div>
   </div>
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted} from 'vue'
+import {defineProps, defineEmits} from 'vue'
 import {useVueFlow, Handle, Position} from "@vue-flow/core";
 const {updateNodeData} = useVueFlow()
 const emit = defineEmits(['nodesChange'])
@@ -30,23 +32,25 @@ const emit = defineEmits(['nodesChange'])
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
+let updateType = (type) => {
+  updateNodeData(props.id, {type})
+  emit('moduleChanged')
+}
+
 let updateFrequency = (frequency) => {
   updateNodeData(props.id, {frequency})
   emit('moduleChanged')
 }
-let updateWaveform = (waveform) => {
-  updateNodeData(props.id, {waveform})
-  emit('moduleChanged')
+</script>
+<script>
+export default {
+  data(){
+    return {
+      frequency: null,
+      waveform: "sine"
+    }
+  }
 }
-
-let initialize = (frequency, waveform) => {
-  updateNodeData(props.id, {frequency, waveform})
-}
-
-onMounted(() => {
-  initialize(400, "sine")
-})
-
 </script>
 <style scoped>
 span {

@@ -6,7 +6,7 @@
         <div class="description">Modules</div>
         <div class="nodes">
           <div class="node vue-flow__node-oscillator" :draggable="true" @dragstart="onDragStart($event, 'oscillator')">Oscillator</div>
-
+          <div class="node vue-flow__node-filter" :draggable="true" @dragstart="onDragStart($event, 'filter')">Filter</div>
         </div>
       </aside>
     </div>
