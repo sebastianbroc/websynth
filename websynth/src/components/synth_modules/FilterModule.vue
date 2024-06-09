@@ -8,10 +8,10 @@
     </div>
     <div class="controls">
       <div>
-        <input type="text" @input="event => updateFrequency(event.target.value)"><span>Hz</span>
+        <input type="text" @input="event => updateFrequency(event.target.value)" value="400"><span>Hz</span>
       </div>
       <select @input="event => updateType(event.target.value)">
-        <option value="lowpass">Low-Pass</option>
+        <option value="lowpass" selected>Low-Pass</option>
         <option value="highpass">High-Pass</option>
         <option value="bandpass">Band-Pass</option>
         <option value="lowshelf">Low-Shelf</option>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits} from 'vue'
+import {defineProps, defineEmits, onMounted} from 'vue'
 import {useVueFlow, Handle, Position} from "@vue-flow/core";
 const {updateNodeData} = useVueFlow()
 const emit = defineEmits(['nodesChange'])
@@ -41,6 +41,14 @@ let updateFrequency = (frequency) => {
   updateNodeData(props.id, {frequency})
   emit('moduleChanged')
 }
+
+let initialize = (type, frequency) => {
+  updateNodeData(props.id, {type, frequency})
+}
+
+onMounted(() => {
+  initialize("lowpass", 400)
+})
 </script>
 <script>
 export default {

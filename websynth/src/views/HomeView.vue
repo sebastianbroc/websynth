@@ -59,55 +59,60 @@ export default {
     },
     buildConnection(source){
       let target = this.getModuleChild(source.id)
-      let audioNode = this.audioNodeList.find(n => n.id === source.id)
+      if(target){
+        let audioNode = this.audioNodeList.find(n => n.id === source.id)
+        let targetAudioNode = this.audioNodeList.find(n => n.id === target.target)
 
 
+        if (target && !audioNode.connected){
+          if(target.targetNode.type === "output"){
+            audioNode.module.connect(this.mainVolume)
+            audioNode.connected = true
+            console.log("connected to main volume")
+          } else {
+            audioNode.module.connect(targetAudioNode.module)
+          }
 
-      if (target && !audioNode.connected){
-        if(target.targetNode.type === "output"){
-          audioNode.module.connect(this.mainVolume)
-          audioNode.connected = true
-          console.log("connected to main volume")
-        } else {
-          audioNode.module.connect(target)
-        }
-
-        try{
-          audioNode.module.start()
-        } catch(e){
-          //do nothing
+          try{ //in case it is an oscillator, we have to start it *after* connecting to the main Volume
+            audioNode.module.start()
+          } catch(e){
+            //do nothing
+          }
         }
       }
     },
     handleNodeList(module){
       if(module.type !== "output" && module.type !== "default"){
         let Node = this.audioNodeList.find(n => n.id === module.id);
-        if(Node) Node = Node.module
         let isNewNode = !Node
+        let createdNewNode = false
+        if(Node) Node = Node.module
 
         switch(module.type){
           case 'filter':
-            if(!Node) Node = this.audioContext.createBiquadFilter()
-            Node.frequency = module.data.frequency
-            Node.type = module.data.type
+            if(module.data && module.data.frequency){
+              if(isNewNode) Node = this.audioContext.createBiquadFilter()
+              Node.frequency.setValueAtTime(module.data.frequency, this.audioContext.currentTime + 0.01)
+              Node.type = module.data.type
+              createdNewNode = true
+            }
             break;
           case 'oscillator':
-            if(!Node){
+            if(isNewNode){
               Node = this.audioContext.createOscillator()
-              isNewNode = true
             }
             if(module.data.frequency){
-              console.log(module.data)
               Node.frequency.value = module.data.frequency
               Node.type = module.data.waveform
               if (isNewNode){
                 Node.start()
                 console.log("started oscillator")
               }
+              createdNewNode = true
             }
             break;
         }
-        if(isNewNode) this.audioNodeList.push({"id": module.id, module: Node, connected: false})
+        if(isNewNode && createdNewNode) this.audioNodeList.push({"id": module.id, module: Node, connected: false})
       }
     },
     handleOscillator(id, freq, waveform){
