@@ -67,17 +67,25 @@ export default {
         if (target && !audioNode.connected){
           if(target.targetNode.type === "output"){
             audioNode.module.connect(this.mainVolume)
-            audioNode.connected = true
             console.log("connected to main volume")
           } else {
             audioNode.module.connect(targetAudioNode.module)
           }
+          audioNode.connected = true
 
           try{ //in case it is an oscillator, we have to start it *after* connecting to the main Volume
             audioNode.module.start()
           } catch(e){
             //do nothing
           }
+        }
+      } else {
+        try {
+          let audioNode = this.audioNodeList.find(n => n.id === source.id)
+          audioNode.connected = false
+          audioNode.module.disconnect()
+        }catch(e){
+          //do nothing
         }
       }
     },
