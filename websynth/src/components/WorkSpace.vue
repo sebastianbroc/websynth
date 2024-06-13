@@ -1,7 +1,7 @@
 <template>
   <div class="workspace" @drop="onDrop">
     <ModuleBar></ModuleBar>
-    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" @nodesChange="getModules" @edgesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
+    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" :connect-on-click="true" @nodesChange="getModules" @edgesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
       <MiniMap />
       <template #node-oscillator="customNodeProps">
@@ -12,6 +12,9 @@
       </template>
       <template #node-output="customNodeProps">
         <OutputModule v-bind="customNodeProps" />
+      </template>
+      <template #node-mixer="customNodeProps">
+        <MixerModule v-bind="customNodeProps" />
       </template>
     </VueFlow>
   </div>
@@ -24,6 +27,7 @@ import useDragAndDrop from '@/mixins/useDnD'
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
 import FilterModule from "@/components/synth_modules/FilterModule.vue";
+import MixerModule from "@/components/synth_modules/MixerModule.vue";
 
 const { onConnect, addEdges } = useVueFlow()
 const { onDragOver, onDrop, onDragLeave } = useDragAndDrop()
@@ -32,10 +36,12 @@ onConnect(addEdges)
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
   output: markRaw(OutputModule),
-  filter: markRaw(FilterModule)
+  filter: markRaw(FilterModule),
+  mixer: markRaw(MixerModule)
 }
 
 const elements = ref([
+  { id: '2', type: 'mixer', label: 'Mixer', position: { x: 200, y: 200 } },
   { id: '3', type: 'oscillator', label: 'Oscillator', position: { x: 400, y: 200 } },
   {
     id: '4',

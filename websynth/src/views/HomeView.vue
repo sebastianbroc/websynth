@@ -66,10 +66,20 @@ export default {
 
         if (target && !audioNode.connected){
           if(target.targetNode.type === "output"){
-            audioNode.module.connect(this.mainVolume)
+            if(Array.isArray(audioNode.module)) {
+              audioNode.module[0].connect(this.mainVolume)
+            } else {
+              audioNode.module.connect(this.mainVolume)
+            }
             console.log("connected to main volume")
+          } else if (target.targetNode.type === "mixer"){
+            audioNode.module.connect(targetAudioNode.module[parseInt(parseInt(target.targetHandle) + 1)])
           } else {
-            audioNode.module.connect(targetAudioNode.module)
+            if(Array.isArray(audioNode.module)) {
+              audioNode.module[0].connect(targetAudioNode.module)
+            } else {
+              audioNode.module.connect(targetAudioNode.module)
+            }
           }
           audioNode.connected = true
 
@@ -97,6 +107,25 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
+          case 'mixer':
+            if(module.data){
+              if(isNewNode){
+                //the gain node at position 0 is our main out of the mixer
+                let gainNodes = [this.audioContext.createGain()]
+                gainNodes[0].gain.setValueAtTime(1, this.audioContext.currentTime)
+                for(let i = 0; i < module.data.channels ; i++){
+                  let newGainNode = this.audioContext.createGain()
+                  newGainNode.connect(gainNodes[0])
+                  gainNodes.push(newGainNode)
+                }
+                Node = gainNodes
+              }
+              for(let i = 0; i < module.data.channels ; i++){
+                Node[i + 1].gain.setValueAtTime(module.data.volumes[i], this.audioContext.currentTime)
+              }
+              createdNewNode = true
+            }
+            break;
           case 'filter':
             if(module.data && module.data.frequency){
               if(isNewNode) Node = this.audioContext.createBiquadFilter()

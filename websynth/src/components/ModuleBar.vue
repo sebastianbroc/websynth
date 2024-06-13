@@ -5,8 +5,9 @@
       <aside>
         <div class="description">Modules</div>
         <div class="nodes">
-          <div class="node vue-flow__node-oscillator" :draggable="true" @dragstart="onDragStart($event, 'oscillator')">Oscillator</div>
-          <div class="node vue-flow__node-filter" :draggable="true" @dragstart="onDragStart($event, 'filter')">Filter</div>
+          <div class="node vue-flow__node-oscillator" :draggable="true" @dragstart="onDragStart($event, 'oscillator')">Oscillator <img class="icon" src="@/assets/icons/icon_oscillator.png"></div>
+          <div class="node vue-flow__node-filter" :draggable="true" @dragstart="onDragStart($event, 'filter')">Filter <img class="icon" src="@/assets/icons/icon_filter.png"></div>
+          <div class="node vue-flow__node-mixer" :draggable="true" @dragstart="onDragStart($event, 'mixer')">Mixer <img class="icon" src="@/assets/icons/icon_mixer.png"></div>
         </div>
       </aside>
     </div>
@@ -25,7 +26,7 @@ export default {
   name: 'ModuleBar',
   data(){
     return {
-      expanded: false
+      expanded: true
     }
   },
   methods: {
@@ -88,11 +89,20 @@ aside .nodes {
 }
 
 aside .nodes .node {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: white;
-  text-align: center;
+  text-align: left;
   padding: 10px;
   border: solid 1px black;
   border-radius: 5px;
   font-size: 0.8rem;
+
+  .icon {
+    width: 30px;
+    padding: 0;
+    margin: 0;
+  }
 }
 </style>
