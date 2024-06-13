@@ -48,6 +48,7 @@ export default {
   background: var(--c-five);
   font-family: monospace;
   padding: 10px;
+  border-radius: 0 0 0 4px;
 
   &.expanded {
     right: 0;

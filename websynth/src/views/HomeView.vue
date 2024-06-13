@@ -73,7 +73,7 @@ export default {
             }
             console.log("connected to main volume")
           } else if (target.targetNode.type === "mixer"){
-            audioNode.module.connect(targetAudioNode.module[parseInt(parseInt(target.targetHandle) + 1)])
+            audioNode.module.connect(targetAudioNode.module[parseInt(target.targetHandle)])
           } else {
             if(Array.isArray(audioNode.module)) {
               audioNode.module[0].connect(targetAudioNode.module)
@@ -93,7 +93,11 @@ export default {
         try {
           let audioNode = this.audioNodeList.find(n => n.id === source.id)
           audioNode.connected = false
-          audioNode.module.disconnect()
+          if(Array.isArray(audioNode.module)){
+            audioNode.module[0].disconnect()
+          } else {
+            audioNode.module.disconnect()
+          }
         }catch(e){
           //do nothing
         }
