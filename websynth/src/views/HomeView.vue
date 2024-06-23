@@ -42,15 +42,6 @@ export default {
       this.elements.forEach(module => {
         this.handleNodeList(module)
         this.buildConnection(module)
-
-
-        /*switch(module.type){
-          case 'oscillator':
-            if(module.data.frequency) this.handleOscillator(module.id, module.data.frequency, module.data.waveform)
-            break;
-          case 'filter':
-            this.buildConnection(module)
-        }*/
       })
     },
     getModuleChild(id){

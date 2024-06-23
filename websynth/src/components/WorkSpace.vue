@@ -21,17 +21,29 @@
 </template>
 
 <script setup>
-import {ref, markRaw} from 'vue';
+import { VueFlow } from '@vue-flow/core'
+import { Background } from '@vue-flow/background'
+import { MiniMap } from '@vue-flow/minimap'
 import {useVueFlow} from '@vue-flow/core';
+import '@vue-flow/minimap/dist/style.css'
+import ModuleBar from "@/components/ModuleBar.vue"
+import {ref, markRaw, onMounted, inject} from 'vue';
+import {set, get} from 'idb-keyval'
 import useDragAndDrop from '@/mixins/useDnD'
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
 import FilterModule from "@/components/synth_modules/FilterModule.vue";
 import MixerModule from "@/components/synth_modules/MixerModule.vue";
 
-const { onConnect, addEdges } = useVueFlow()
+const { toObject, fromObject, onConnect, addEdges } = useVueFlow()
 const { onDragOver, onDrop, onDragLeave } = useDragAndDrop()
 onConnect(addEdges)
+const eventBus = inject("eventBus")
+
+let vueFlowInstance = null;
+
+// eslint-disable-next-line no-undef
+const emit = defineEmits(['updateElements'])
 
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
@@ -40,7 +52,7 @@ const nodeTypes = {
   mixer: markRaw(MixerModule)
 }
 
-const elements = ref([
+let elements = ref([
   { id: '2', type: 'mixer', label: 'Mixer', position: { x: 200, y: 200 } },
   { id: '3', type: 'oscillator', label: 'Oscillator', position: { x: 400, y: 200 } },
   {
@@ -50,43 +62,66 @@ const elements = ref([
     position: { x: 500, y: 300 }
   }
 ])
-</script>
 
-<script>
-import { VueFlow } from '@vue-flow/core'
-import { Background } from '@vue-flow/background'
-import { MiniMap } from '@vue-flow/minimap'
-import '@vue-flow/minimap/dist/style.css'
-import ModuleBar from "@/components/ModuleBar.vue";
-export default {
-  name: 'WorkSpace',
-  data() {
-    return {
-      vueFlowInstance: null,
-      moduleList: []
+const initial_elements = {
+  "nodes": [
+    {
+      "id": "1",
+      "type": "output",
+      "position": {
+        "x": 500,
+        "y": 300
+      },
+      "data": {},
+      "label": "Output"
     }
-  },
-  components: {
-    VueFlow,
-    MiniMap,
-    Background,
-    ModuleBar
-  },
-  methods: {
-    setInstance(vueFlowInstance){
-      console.log("instance has been set")
-      this.vueFlowInstance = vueFlowInstance
-      this.getModules()
-    },
-    getModules(){
-      if(this.vueFlowInstance){
-        this.$emit('updateElements', this.vueFlowInstance.getElements)
-      }
+  ],
+  "edges": [],
+  "position": [
+    0,
+    0
+  ],
+  "zoom": 1,
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1
+  }
+}
+
+onMounted(() => {
+  console.log("mounted")
+  get("flow").then(value => {
+    let flow = JSON.parse(value)
+    console.log(flow)
+    if(flow.nodes.filter(n => n.type === "output").length === 0){ //make sure there always is an output
+      flow.nodes.push({id: '4', type: 'output', label: 'Output', position: { x: 500, y: 300 }})
     }
+    fromObject(flow)
+  })
+
+  eventBus.on("navBar-click", (param) => {
+    if(param === "reset workspace"){
+      console.log("resetting workspace...")
+      fromObject(initial_elements)
+      getModules()
+    }
+  })
+})
+
+const setInstance = (instance) => {
+  console.log("instance has been set")
+  vueFlowInstance = instance
+  getModules()
+}
+const getModules = () => {
+  if (vueFlowInstance) {
+    let elements = vueFlowInstance.getElements
+    emit('updateElements', elements)
+    set("flow", JSON.stringify(toObject()))
   }
 }
 </script>
-
 <style>
 /* import the necessary styles for Vue Flow to work */
 @import '@vue-flow/core/dist/style.css';

@@ -13,6 +13,8 @@
 
   --warning-one: #ff7300;
   --warning-two: #ff0000;
+
+  --lighten: rgba(255,255,255,0.8);
 }
 
 #app {
