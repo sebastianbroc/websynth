@@ -12,6 +12,8 @@
     "@vue-flow/core": "^1.33.6",
     "@vue-flow/minimap": "^1.4.0",
     "core-js": "^3.8.3",
+    "idb-keyval": "^6.2.1",
+    "mitt": "^3.0.1",
     "register-service-worker": "^1.7.2",
     "sass": "^1.77.1",
     "vue": "^3.2.13",
