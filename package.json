@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "idb-keyval": "^6.2.1",
+    "mitt": "^3.0.1"
+  }
+}
