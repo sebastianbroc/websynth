@@ -1,8 +1,6 @@
 <template>
   <div class="main">
     <NavBar></NavBar>
-    <!--<button @click="playTone(500)">Ton</button>-->
-    <!--<p id="audioNodeList">{{elements}}</p>-->
     <p id="audioNodeList">{{audioNodeList}}</p>
     <WorkSpace @updateElements="updateElements"></WorkSpace>
   </div>
@@ -35,6 +33,7 @@ export default {
       this.mainVolume = this.audioContext.createGain();
       this.mainVolume.connect(this.audioContext.destination);
       this.mainVolume.gain.value = 1.0;
+      console.log("initialized audio")
     },
     updateElements(value){
       this.elements = value
@@ -76,8 +75,10 @@ export default {
 
           try{ //in case it is an oscillator, we have to start it *after* connecting to the main Volume
             audioNode.module.start()
+            console.log("started oscillator after main volume connection")
           } catch(e){
             //do nothing
+            console.log(e)
           }
         }
       } else {
@@ -89,7 +90,7 @@ export default {
           } else {
             audioNode.module.disconnect()
           }
-        }catch(e){
+        } catch(e){
           //do nothing
         }
       }
@@ -116,7 +117,11 @@ export default {
                 Node = gainNodes
               }
               for(let i = 0; i < module.data.channels ; i++){
-                Node[i + 1].gain.setValueAtTime(module.data.volumes[i], this.audioContext.currentTime)
+                try{
+                  Node[i + 1].gain.setValueAtTime(module.data.volumes[i], this.audioContext.currentTime)
+                } catch(e){
+                  //do nothing
+                }
               }
               createdNewNode = true
             }
@@ -136,10 +141,6 @@ export default {
             if(module.data.frequency){
               Node.frequency.value = module.data.frequency
               Node.type = module.data.waveform
-              if (isNewNode){
-                Node.start()
-                console.log("started oscillator")
-              }
               createdNewNode = true
             }
             break;

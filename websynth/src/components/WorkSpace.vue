@@ -36,7 +36,6 @@ import FilterModule from "@/components/synth_modules/FilterModule.vue";
 import MixerModule from "@/components/synth_modules/MixerModule.vue";
 
 const { toObject, fromObject, onConnect, addEdges } = useVueFlow()
-const { onDragOver, onDrop, onDragLeave } = useDragAndDrop()
 onConnect(addEdges)
 const eventBus = inject("eventBus")
 
@@ -53,8 +52,6 @@ const nodeTypes = {
 }
 
 let elements = ref([
-  { id: '2', type: 'mixer', label: 'Mixer', position: { x: 200, y: 200 } },
-  { id: '3', type: 'oscillator', label: 'Oscillator', position: { x: 400, y: 200 } },
   {
     id: '4',
     type: 'output',
@@ -90,13 +87,12 @@ const initial_elements = {
 }
 
 onMounted(() => {
-  console.log("mounted")
   get("flow").then(value => {
     let flow = JSON.parse(value)
-    console.log(flow)
     if(flow.nodes.filter(n => n.type === "output").length === 0){ //make sure there always is an output
       flow.nodes.push({id: '4', type: 'output', label: 'Output', position: { x: 500, y: 300 }})
     }
+
     fromObject(flow)
   })
 
@@ -107,6 +103,8 @@ onMounted(() => {
       getModules()
     }
   })
+
+  getModules()
 })
 
 const setInstance = (instance) => {
@@ -121,6 +119,18 @@ const getModules = () => {
     set("flow", JSON.stringify(toObject()))
   }
 }
+
+const initDragAndDrop = () => {
+  get("flow").then(value => {
+    let flow = JSON.parse(value)
+    let max = flow.nodes.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
+    max = Math.max(...max)
+    initializeId(max + 1)
+  })
+}
+
+const { onDragOver, onDrop, onDragLeave, initializeId } = useDragAndDrop()
+initDragAndDrop()
 </script>
 <style>
 /* import the necessary styles for Vue Flow to work */

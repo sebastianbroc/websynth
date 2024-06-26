@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 
 let id = 0
 
+
 /**
  * @returns {string} - A unique id.
  */
@@ -31,6 +32,10 @@ export default function useDragAndDrop() {
     watch(isDragging, (dragging) => {
         document.body.style.userSelect = dragging ? 'none' : ''
     })
+
+    function initializeId(start_id){
+        id = start_id
+    }
 
     function onDragStart(event, type) {
         if (event.dataTransfer) {
@@ -109,6 +114,7 @@ export default function useDragAndDrop() {
     }
 
     return {
+        initializeId,
         draggedType,
         isDragOver,
         isDragging,
