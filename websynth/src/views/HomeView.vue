@@ -42,10 +42,25 @@ export default {
         this.handleNodeList(module)
         this.buildConnection(module)
       })
+      this.handleOrphans()
     },
     getModuleChild(id){
       //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
       return this.elements.find(m => m.type == "default" && m.sourceNode.id === id)
+    },
+    handleOrphans(){
+      this.audioNodeList.forEach((audioNode, index) => {
+          let match = this.elements.find(e => e.id === audioNode.id)
+          if(!match){
+            if(Array.isArray(audioNode.module)) {
+              audioNode.module[0].disconnect()
+            } else {
+              audioNode.module.disconnect()
+            }
+
+            this.audioNodeList.splice(index, 1)
+          }
+      })
     },
     buildConnection(source){
       let target = this.getModuleChild(source.id)

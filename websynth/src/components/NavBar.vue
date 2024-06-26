@@ -64,7 +64,7 @@ export default {
       }
     }
 
-    &:has(.active) {
+    &:has(a.active) {
       background: var(--lighten);
 
       .options {

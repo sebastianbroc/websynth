@@ -125,7 +125,7 @@ const initDragAndDrop = () => {
     let flow = JSON.parse(value)
     let max = flow.nodes.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
     max = Math.max(...max)
-    initializeId(max + 1)
+    initializeId(max === -Infinity ? 0 : max + 1)
   })
 }
 
