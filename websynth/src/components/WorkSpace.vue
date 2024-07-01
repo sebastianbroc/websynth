@@ -16,6 +16,12 @@
       <template #node-mixer="customNodeProps">
         <MixerModule v-bind="customNodeProps" />
       </template>
+      <template #node-envelope="customNodeProps">
+        <EnvelopeModule v-bind="customNodeProps" />
+      </template>
+      <template #node-vca="customNodeProps">
+        <VCAModule v-bind="customNodeProps" />
+      </template>
     </VueFlow>
   </div>
 </template>
@@ -34,6 +40,8 @@ import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
 import FilterModule from "@/components/synth_modules/FilterModule.vue";
 import MixerModule from "@/components/synth_modules/MixerModule.vue";
+import EnvelopeModule from "@/components/synth_modules/EnvelopeModule.vue";
+import VCAModule from "@/components/synth_modules/VCAModule.vue";
 
 const { toObject, fromObject, onConnect, addEdges } = useVueFlow()
 onConnect(addEdges)
@@ -48,7 +56,9 @@ const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
   output: markRaw(OutputModule),
   filter: markRaw(FilterModule),
-  mixer: markRaw(MixerModule)
+  mixer: markRaw(MixerModule),
+  envelope: markRaw(EnvelopeModule),
+  vca: markRaw(VCAModule)
 }
 
 let elements = ref([

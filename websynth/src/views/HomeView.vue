@@ -70,44 +70,41 @@ export default {
 
 
         if (target && !audioNode.connected){
-          if(target.targetNode.type === "output"){
-            if(Array.isArray(audioNode.module)) {
-              audioNode.module[0].connect(this.mainVolume)
-            } else {
-              audioNode.module.connect(this.mainVolume)
-            }
-            console.log("connected to main volume")
-          } else if (target.targetNode.type === "mixer"){
-            audioNode.module.connect(targetAudioNode.module[parseInt(target.targetHandle)])
-          } else {
-            if(Array.isArray(audioNode.module)) {
-              audioNode.module[0].connect(targetAudioNode.module)
-            } else {
-              audioNode.module.connect(targetAudioNode.module)
-            }
+          switch(target.targetNode.type){
+            case 'output':
+              if(Array.isArray(audioNode.module)) {
+                audioNode.module[0].connect(this.mainVolume)
+              } else {
+                audioNode.module.connect(this.mainVolume)
+              }
+              break;
+            case 'mixer':
+              audioNode.module.connect(targetAudioNode.module[parseInt(target.targetHandle)])
+              break;
+            default:
+              if(target.targetHandle){
+                console.log("connecting to custom target")
+                console.log(target.targetHandle)
+                if(target.targetHandle === "main"){
+                  audioNode.module.connect(targetAudioNode.module)
+                } else if(Array.isArray(audioNode.module)) {
+                  audioNode.module[0].connect(targetAudioNode.module)
+                } else {
+                  audioNode.module.connect(targetAudioNode.module[target.targetHandle])
+                }
+              }
+              break;
           }
-          audioNode.connected = true
 
+          audioNode.connected = true
           try{ //in case it is an oscillator, we have to start it *after* connecting to the main Volume
             audioNode.module.start()
-            console.log("started oscillator after main volume connection")
           } catch(e){
             //do nothing
-            console.log(e)
           }
         }
       } else {
-        try {
-          let audioNode = this.audioNodeList.find(n => n.id === source.id)
-          audioNode.connected = false
-          if(Array.isArray(audioNode.module)){
-            audioNode.module[0].disconnect()
-          } else {
-            audioNode.module.disconnect()
-          }
-        } catch(e){
-          //do nothing
-        }
+        this.handleDisconnection(source)
       }
     },
     handleNodeList(module){
@@ -118,6 +115,13 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
+          case 'vca':
+            if(isNewNode){
+              Node = this.audioContext.createGain()
+              Node.gain.setValueAtTime(1, this.audioContext.currentTime)
+              createdNewNode = true
+            }
+            break;
           case 'mixer':
             if(module.data){
               if(isNewNode){
@@ -163,41 +167,19 @@ export default {
         if(isNewNode && createdNewNode) this.audioNodeList.push({"id": module.id, module: Node, connected: false})
       }
     },
-    handleOscillator(id, freq, waveform){
-      let presentOscFound = false
-      this.audioNodeList.forEach(osc => {
-        if(osc.id === id){
-          osc.module.frequency.value = freq
-          osc.module.type = waveform
-          presentOscFound = true
-          if (this.getModuleChild(id) && this.getModuleChild(id).targetNode.type === "output"){
-            console.log("connected to main output")
-            osc.module.connect(this.mainVolume)
-            osc.connected = true
-          } else if (osc.connected) {
-            try {
-              osc.module.disconnect(this.mainVolume)
-              osc.connected = false
-            } catch(e){
-              //disconnection failed, do nothing as it is likely because it is already disconnected
-              osc.connected = false
-            }
-          }
+    handleDisconnection(source){
+      try {
+        let audioNode = this.audioNodeList.find(n => n.id === source.id)
+        audioNode.connected = false
+        if(Array.isArray(audioNode.module)){
+          audioNode.module[0].disconnect()
+        } else {
+          audioNode.module.disconnect()
         }
-      })
-
-      if(!presentOscFound){
-        const newOsc = this.audioContext.createOscillator();
-        if (this.getModuleChild(id) && this.getModuleChild(id).targetNode.type === "output"){
-          console.log("added to osc list and connected to main output")
-          newOsc.connect(this.mainVolume);
-        }
-        newOsc.type = waveform;
-        newOsc.frequency.value = freq;
-        newOsc.start();
-        this.audioNodeList.push({"id": id, module: newOsc, connected: true})
+      } catch(e){
+        //do nothing
       }
-    }
+    },
   }
 }
 </script>

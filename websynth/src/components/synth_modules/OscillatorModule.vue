@@ -8,9 +8,12 @@
     </div>
     <div class="controls">
       <div>
-        <input type="text" @input="event => updateFrequency(event.target.value)" value="400"><span>Hz</span>
+        <Knob v-model="frequency" :min="0" :size="50" :max="20000" style="z-index: 5000; display: none;"></Knob>
       </div>
-      <select @input="event => updateWaveform(event.target.value)">
+      <div>
+        <input type="text" v-model="frequency" @input="event => updateFrequency(event.target.value)"><span>Hz</span>
+      </div>
+      <select @input="event => updateWaveform(event.target.value)" v-model="waveform">
         <option value="sine" selected>Sine</option>
         <option value="sawtooth">Saw</option>
         <option value="square">Square</option>
@@ -21,7 +24,8 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted} from 'vue'
+import Knob from "primevue/knob"
+import {defineProps, defineEmits, onMounted, watch} from 'vue'
 import {useVueFlow, Handle, Position} from "@vue-flow/core";
 const {updateNodeData} = useVueFlow()
 const emit = defineEmits(['nodesChange'])
@@ -29,6 +33,9 @@ const emit = defineEmits(['nodesChange'])
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
+
+let frequency = null
+let waveform = null
 
 let updateFrequency = (frequency) => {
   updateNodeData(props.id, {frequency})
@@ -45,7 +52,14 @@ let initialize = (frequency, waveform) => {
 
 onMounted(() => {
   initialize(400, "sine")
+  frequency = 400
+  waveform = "sine"
 })
+
+watch(frequency, (newValue) => {
+  console.log(frequency)
+  updateFrequency(newValue)
+});
 
 </script>
 <style scoped>

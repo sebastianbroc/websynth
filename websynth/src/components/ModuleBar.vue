@@ -8,6 +8,8 @@
           <div class="node vue-flow__node-oscillator" :draggable="true" @dragstart="onDragStart($event, 'oscillator')">Oscillator <img class="icon" src="@/assets/icons/icon_oscillator.png"></div>
           <div class="node vue-flow__node-filter" :draggable="true" @dragstart="onDragStart($event, 'filter')">Filter <img class="icon" src="@/assets/icons/icon_filter.png"></div>
           <div class="node vue-flow__node-mixer" :draggable="true" @dragstart="onDragStart($event, 'mixer')">Mixer <img class="icon" src="@/assets/icons/icon_mixer.png"></div>
+          <div class="node vue-flow__node-envelope" :draggable="true" @dragstart="onDragStart($event, 'envelope')">Envelope <img class="icon" src="@/assets/icons/icon_envelope.png"></div>
+          <div class="node vue-flow__node-vca" :draggable="true" @dragstart="onDragStart($event, 'vca')">VCA <img class="icon" src="@/assets/icons/icon_vca.png"></div>
         </div>
       </aside>
     </div>
