@@ -9,9 +9,11 @@
 <script>
 import WorkSpace from "@/components/WorkSpace.vue";
 import NavBar from "@/components/NavBar.vue";
+import EnvelopeGenerator from '@/mixins/envelopeGenerator'
 
 export default {
   name: 'HomeView',
+  inject: ["eventBus"],
   components: {
     WorkSpace,
     NavBar
@@ -36,6 +38,7 @@ export default {
       console.log("initialized audio")
     },
     updateElements(value){
+      console.log("updating elements")
       this.elements = value
 
       this.elements.forEach(module => {
@@ -67,7 +70,6 @@ export default {
       if(target){
         let audioNode = this.audioNodeList.find(n => n.id === source.id)
         let targetAudioNode = this.audioNodeList.find(n => n.id === target.target)
-
 
         if (target && !audioNode.connected){
           switch(target.targetNode.type){
@@ -115,6 +117,20 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
+          case 'envelope':
+            if(isNewNode){
+              Node = new EnvelopeGenerator(this.audioContext, (module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
+              console.log(Node)
+              createdNewNode = true
+            } else {
+              Node.updateData((module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
+            }
+
+            if(module.data.triggered){
+              console.log("trying to trigger...")
+              Node.trigger()
+            }
+            break;
           case 'vca':
             if(isNewNode){
               Node = this.audioContext.createGain()
@@ -179,7 +195,7 @@ export default {
       } catch(e){
         //do nothing
       }
-    },
+    }
   }
 }
 </script>

@@ -20,14 +20,14 @@
         <span>R</span><div><input type="number" min="0" v-model="release" @input="updateData"><span>ms</span></div>
       </div>
       <div class="control_row">
-        <button>trigger</button>
+        <button @click="manualTrigger">trigger</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted} from 'vue'
+import {defineProps, defineEmits, onMounted } from 'vue'
 import {useVueFlow, Handle, Position} from "@vue-flow/core";
 const {updateNodeData} = useVueFlow()
 const emit = defineEmits(['nodesChange'])
@@ -36,24 +36,32 @@ const emit = defineEmits(['nodesChange'])
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
-let attack = 0
-let decay = 0
-let sustain = 0
-let release = 0
+let attack = 10
+let decay = 10
+let sustain = 10
+let release = 20
+
+let triggered = false
 
 let updateData = () => {
-  updateNodeData(props.id, {attack, decay, sustain, release})
+  updateNodeData(props.id, {attack, decay, sustain, release, triggered})
   emit('moduleChanged')
+  triggered = false
 }
 
-let initialize = (attack, decay, sustain, release) => {
-  updateNodeData(props.id, {attack, decay, sustain, release})
+let initialize = (attack, decay, sustain, release, triggered) => {
+  updateNodeData(props.id, {attack, decay, sustain, release, triggered})
 }
 
 onMounted(() => {
-  initialize(0,0, 0, 0)
+  initialize(10,10, 10, 20, false)
 })
 
+let manualTrigger = () => {
+  console.log("manual trigger")
+  triggered = true
+  updateData()
+}
 </script>
 <style scoped>
 span {

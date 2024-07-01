@@ -11,16 +11,16 @@
         <FilterModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
       <template #node-output="customNodeProps">
-        <OutputModule v-bind="customNodeProps" />
+        <OutputModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
       <template #node-mixer="customNodeProps">
-        <MixerModule v-bind="customNodeProps" />
+        <MixerModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
       <template #node-envelope="customNodeProps">
-        <EnvelopeModule v-bind="customNodeProps" />
+        <EnvelopeModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
       <template #node-vca="customNodeProps">
-        <VCAModule v-bind="customNodeProps" />
+        <VCAModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
     </VueFlow>
   </div>
