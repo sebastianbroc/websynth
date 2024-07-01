@@ -1,6 +1,6 @@
 <template>
   <div class="synth_module">
-    <Handle type="target" :position="Position.Top" />
+    <Handle id="main" type="target" :position="Position.Top" />
     <Handle type="source" :position="Position.Bottom" />
     <div class="module_label">
       <h3>Filter</h3>

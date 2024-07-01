@@ -29,4 +29,8 @@ export default function EnvelopeGenerator(context, a, d, s, r) {
     EnvelopeGenerator.prototype.connect = function(param) {
         this.param = param;
     };
+
+    EnvelopeGenerator.prototype.disconnect = function() {
+        this.param = null;
+    };
 }
