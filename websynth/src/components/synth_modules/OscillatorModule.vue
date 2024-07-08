@@ -10,13 +10,13 @@
     </div>
     <div class="controls">
       <div>
-        <Knob v-model="frequency" :min="0" :size="50" :max="20000" style="z-index: 5000; display: none;"></Knob>
+        <Knob v-bind:value="node.data.frequency" v-on:input="node.data.frequency = $event.target.value" :min="0" :size="50" :max="20000" style="z-index: 5000; display: none;"></Knob>
       </div>
       <div>
-        <input type="text" v-model="frequency" @input="event => updateFrequency(event.target.value)"><span>Hz</span>
+        <input type="text" v-model="node.data.frequency" v-on:input="emitChange"><span>Hz</span>
       </div>
-      <select @input="event => updateWaveform(event.target.value)" v-model="waveform">
-        <option value="sine" selected>Sine</option>
+      <select v-model="node.data.waveform" v-on:change="emitChange">
+        <option value="sine">Sine</option>
         <option value="sawtooth">Saw</option>
         <option value="square">Square</option>
         <option value="triangle">Triangle</option>
@@ -31,41 +31,26 @@
 
 <script setup>
 import Knob from "primevue/knob"
-import {defineProps, defineEmits, onMounted, watch} from 'vue'
-import {useVueFlow, Handle, Position} from "@vue-flow/core";
-const {updateNodeData} = useVueFlow()
+import {defineEmits, defineProps, onMounted} from 'vue'
+import {Handle, Position, useNode} from "@vue-flow/core";
+const {node} = useNode()
 const emit = defineEmits(['nodesChange'])
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
-let frequency = null
-let waveform = null
-
-let updateFrequency = (frequency) => {
-  updateNodeData(props.id, {frequency})
-  emit('moduleChanged')
-}
-let updateWaveform = (waveform) => {
-  updateNodeData(props.id, {waveform})
-  emit('moduleChanged')
-}
-
-let initialize = (frequency, waveform) => {
-  updateNodeData(props.id, {frequency, waveform})
-}
-
 onMounted(() => {
-  initialize(400, "sine")
-  frequency = 400
-  waveform = "sine"
+  node.data = {
+    ...node.data,
+    frequency: node.data.frequency ?? 400,
+    waveform: node.data.waveform ?? "sine"
+  }
 })
 
-watch(frequency, (newValue) => {
-  console.log(frequency)
-  updateFrequency(newValue)
-});
+let emitChange = () => {
+  emit('moduleChanged')
+}
 
 </script>
 <style scoped>

@@ -80,7 +80,8 @@ body {
 
   .control_row {
     display: flex;
-    justify-content: space-between;
+    justify-content: start;
+    gap: 10px;
     align-items: center;
   }
 }
@@ -100,5 +101,6 @@ body {
   border: none !important;
   padding: 0 !important;
   width: 120px !important;
+  --vf-box-shadow: none !important;
 }
 </style>

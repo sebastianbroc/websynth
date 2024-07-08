@@ -1,6 +1,6 @@
 <template>
   <div class="navbar">
-    <div class="navbar-content">
+    <div class="navbar-content one-third">
       <a><b>websynth</b> //</a>
       <div class="category" @click="e => {e.target.classList.toggle('active');}">
         <a>home</a>
@@ -18,7 +18,7 @@
         </div>
       </div>
     </div>
-    <div class="playback_controls">
+    <div class="playback_controls one-third">
       <button @click="emitEvent('pause playback'); this.playing = false;" v-if="playing">
         <img class="icon" src="@/assets/icons/icon_pause.png"><span>pause</span>
       </button>
@@ -26,6 +26,7 @@
         <img class="icon" src="@/assets/icons/icon_play.png"><span>play</span>
       </button>
     </div>
+    <div class="one-third"></div>
   </div>
 </template>
 
@@ -102,9 +103,8 @@ export default {
 }
 
 .playback_controls {
-  position: absolute;
-  left: 50%;
-  top: 12%;
+  display: flex;
+  justify-content: center;
   padding: 3px;
 
   button {
@@ -112,6 +112,7 @@ export default {
     background: var(--c-secondary);
     border-radius: 5px;
     display: flex;
+    justify-content: center;
     align-items: center;
     border: none;
 
@@ -123,5 +124,9 @@ export default {
   .icon {
     width: 20px;
   }
+}
+
+.one-third {
+  width: 33%;
 }
 </style>

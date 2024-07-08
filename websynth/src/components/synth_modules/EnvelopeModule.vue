@@ -9,16 +9,16 @@
     </div>
     <div class="controls">
       <div class="control_row">
-        <span>A</span><div><input type="number" min="0" v-model="attack" @input="updateData"><span>ms</span></div>
+        <span>A</span><div><input type="number" min="0" v-model="node.data.attack" v-on:input="emitChange"><span>ms</span></div>
       </div>
       <div class="control_row">
-        <span>D</span><div><input type="number" min="0" v-model="decay" @input="updateData"><span>ms</span></div>
+        <span>D</span><div><input type="number" min="0" v-model="node.data.decay" v-on:input="emitChange"><span>ms</span></div>
       </div>
       <div class="control_row">
-        <span>S</span><div><input type="number" min="0" v-model="sustain" @input="updateData"><span>ms</span></div>
+        <span>S</span><div><input type="number" min="0" v-model="node.data.sustain" v-on:input="emitChange"><span>ms</span></div>
       </div>
       <div class="control_row">
-        <span>R</span><div><input type="number" min="0" v-model="release" @input="updateData"><span>ms</span></div>
+        <span>R</span><div><input type="number" min="0" v-model="node.data.release" v-on:input="emitChange"><span>ms</span></div>
       </div>
       <div class="control_row">
         <button @click="manualTrigger">trigger</button>
@@ -33,39 +33,35 @@
 
 <script setup>
 import {defineProps, defineEmits, onMounted } from 'vue'
-import {useVueFlow, Handle, Position} from "@vue-flow/core";
-const {updateNodeData} = useVueFlow()
+import {Handle, Position, useNode} from "@vue-flow/core";
 const emit = defineEmits(['nodesChange'])
+const {node} = useNode()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
-let attack = 10
-let decay = 10
-let sustain = 10
-let release = 20
-
-let triggered = false
-
-let updateData = () => {
-  updateNodeData(props.id, {attack, decay, sustain, release, triggered})
-  emit('moduleChanged')
-  triggered = false
-}
-
-let initialize = (attack, decay, sustain, release, triggered) => {
-  updateNodeData(props.id, {attack, decay, sustain, release, triggered})
-}
 
 onMounted(() => {
-  initialize(10,10, 10, 20, false)
+  node.data = {
+    ...node.data,
+    attack: node.data.attack ?? 10,
+    decay: node.data.decay ?? 10,
+    sustain: node.data.sustain ?? 10,
+    release: node.data.release ?? 10,
+    triggered: node.data.triggered ?? false
+  }
 })
 
 let manualTrigger = () => {
   console.log("manual trigger")
-  triggered = true
-  updateData()
+  node.data.triggered = true
+  emitChange()
+}
+
+let emitChange = () => {
+  emit('moduleChanged')
+  node.data.triggered = false
 }
 </script>
 <style scoped>

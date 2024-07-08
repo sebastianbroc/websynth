@@ -44,7 +44,6 @@ export default {
     initAudio(){
       this.audioContext = new AudioContext();
       this.mainVolume = this.audioContext.createGain();
-      this.mainVolume.connect(this.audioContext.destination);
       this.mainVolume.gain.value = 1.0;
       console.log("initialized audio")
     },

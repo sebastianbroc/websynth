@@ -146,7 +146,6 @@ const getModules = () => {
 const initDragAndDrop = () => {
   get("flow").then(value => {
     let flow = null
-    console.log(value)
     if(typeof value !== "undefined"){
       flow = JSON.parse(value)
     } else {

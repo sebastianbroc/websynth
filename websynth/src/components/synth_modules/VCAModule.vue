@@ -33,10 +33,6 @@ const props = defineProps(['id', 'label'])
 
 </script>
 <style scoped>
-span {
-  margin-left: 10px;
-}
-
 h3 {
   margin: 0;
   padding: 0;

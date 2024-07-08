@@ -9,9 +9,9 @@
     </div>
     <div class="controls">
       <div>
-        <input type="text" @input="event => updateFrequency(event.target.value)" value="400"><span>Hz</span>
+        <input type="text" v-model="node.data.frequency" v-on:input="emitChange"><span>Hz</span>
       </div>
-      <select @input="event => updateType(event.target.value)">
+      <select v-model="node.data.type" v-on:change="emitChange">
         <option value="lowpass" selected>Low-Pass</option>
         <option value="highpass">High-Pass</option>
         <option value="bandpass">Band-Pass</option>
@@ -24,7 +24,7 @@
         <Handle id="main" type="target" class="custom_handle port_input" :position="Position.Top" /><span>signal in</span>
       </div>
       <div class="control_row">
-        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>signal out</span>
+        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span>
       </div>
     </div>
   </div>
@@ -32,31 +32,25 @@
 
 <script setup>
 import {defineProps, defineEmits, onMounted} from 'vue'
-import {useVueFlow, Handle, Position} from "@vue-flow/core";
-const {updateNodeData} = useVueFlow()
+import {Handle, Position, useNode} from "@vue-flow/core";
 const emit = defineEmits(['nodesChange'])
+const {node} = useNode()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
-let updateType = (type) => {
-  updateNodeData(props.id, {type})
-  emit('moduleChanged')
-}
-
-let updateFrequency = (frequency) => {
-  updateNodeData(props.id, {frequency})
-  emit('moduleChanged')
-}
-
-let initialize = (type, frequency) => {
-  updateNodeData(props.id, {type, frequency})
-}
-
 onMounted(() => {
-  initialize("lowpass", 400)
+  node.data = {
+    ...node.data,
+    frequency: node.data.frequency ?? 400,
+    type: node.data.type ?? "lowpass"
+  }
 })
+
+let emitChange = () => {
+  emit('moduleChanged')
+}
 </script>
 <script>
 export default {
