@@ -1,10 +1,11 @@
 <template>
   <div class="synth_module">
-    <Handle type="target" :position="Position.Top" />
-    <Handle type="source" :position="Position.Bottom" />
     <div class="module_label">
-      <h3>Envelope</h3>
-      <p>{{ label }}</p>
+      <div>
+        <h3>Envelope</h3>
+        <p>{{ label }}</p>
+      </div>
+      <img class="icon" src="@/assets/icons/icon_envelope.png">
     </div>
     <div class="controls">
       <div class="control_row">
@@ -21,6 +22,10 @@
       </div>
       <div class="control_row">
         <button @click="manualTrigger">trigger</button>
+      </div>
+      <div class="divider_row"></div>
+      <div class="control_row">
+        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span>
       </div>
     </div>
   </div>

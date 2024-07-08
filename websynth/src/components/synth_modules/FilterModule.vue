@@ -1,10 +1,11 @@
 <template>
   <div class="synth_module">
-    <Handle id="main" type="target" :position="Position.Top" />
-    <Handle type="source" :position="Position.Bottom" />
     <div class="module_label">
-      <h3>Filter</h3>
-      <p>{{ label }}</p>
+      <div>
+        <h3>Filter</h3>
+        <p>{{ label }}</p>
+      </div>
+      <img class="icon" src="@/assets/icons/icon_filter.png">
     </div>
     <div class="controls">
       <div>
@@ -18,6 +19,13 @@
         <option value="highshelf">High-Shelf</option>
         <option value="notch">Notch</option>
       </select>
+      <div class="divider_row"></div>
+      <div class="control_row">
+        <Handle id="main" type="target" class="custom_handle port_input" :position="Position.Top" /><span>signal in</span>
+      </div>
+      <div class="control_row">
+        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>signal out</span>
+      </div>
     </div>
   </div>
 </template>
@@ -80,5 +88,9 @@ p {
   padding: 0;
   color: var(--c-semitransparent);
   font-size: 0.6rem;
+}
+
+input[type=text] {
+  width: 80px;
 }
 </style>

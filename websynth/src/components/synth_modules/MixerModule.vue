@@ -1,30 +1,30 @@
 <template>
   <div class="synth_module">
-    <Handle type="source" :position="Position.Bottom" />
     <div class="module_label">
-      <h3>Mixer</h3>
-      <p>{{ label }}</p>
+      <div>
+        <h3>Mixer</h3>
+        <p>{{ label }}</p>
+      </div>
+      <img class="icon" src="@/assets/icons/icon_mixer.png">
     </div>
     <div class="controls">
-      <div class="inputs">
-        <Handle id="1" type="target" :position="Position.Left" style="top: 55px;" />
-        <Handle id="2" type="target" :position="Position.Left" style="top: 86px;" />
-        <Handle id="3" type="target" :position="Position.Left" style="top: 118px;" />
-        <Handle id="4" type="target" :position="Position.Left" style="top: 150px;" />
-      </div>
       <div class="volumes">
         <div class="volume_row">
-          <input type="number" value="100" min="0" @input="event => updateVolumes(0, event.target.value, channels)"><span :class="{warning: volumes[0] > 1}"></span>
+          <Handle id="1" type="target" class="custom_handle port_input" :position="Position.Left" /><input type="number" value="100" min="0" @input="event => updateVolumes(0, event.target.value, channels)"><span :class="{warning: volumes[0] > 1}"></span>
         </div>
         <div class="volume_row">
-          <input type="number" value="100" min="0" @input="event => updateVolumes(1, event.target.value, channels)"><span :class="{warning: volumes[1] > 1}"></span>
+          <Handle id="2" type="target" class="custom_handle port_input" :position="Position.Left"/><input type="number" value="100" min="0" @input="event => updateVolumes(1, event.target.value, channels)"><span :class="{warning: volumes[1] > 1}"></span>
         </div>
         <div class="volume_row">
-          <input type="number" value="100" min="0" @input="event => updateVolumes(2, event.target.value, channels)"><span :class="{warning: volumes[2] > 1}"></span>
+          <Handle id="3" type="target" class="custom_handle port_input" :position="Position.Left"/><input type="number" value="100" min="0" @input="event => updateVolumes(2, event.target.value, channels)"><span :class="{warning: volumes[2] > 1}"></span>
         </div>
         <div class="volume_row">
-          <input type="number" value="100" min="0" @input="event => updateVolumes(3, event.target.value, channels)"><span :class="{warning: volumes[3] > 1}"></span>
+          <Handle id="4" type="target" class="custom_handle port_input" :position="Position.Left"/><input type="number" value="100" min="0" @input="event => updateVolumes(3, event.target.value, channels)"><span :class="{warning: volumes[3] > 1}"></span>
         </div>
+      </div>
+      <div class="divider_row"></div>
+      <div class="control_row">
+        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span>
       </div>
     </div>
   </div>
@@ -64,10 +64,6 @@ onMounted(() => {
 })
 </script>
 <style scoped>
-span {
-  margin-left: 10px;
-}
-
 .controls {
   display: flex;
   flex-direction: column;
@@ -79,6 +75,10 @@ span {
   gap: 10px;
 
   .volume_row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
     span {
       min-width: 10px;
       min-height: 10px;

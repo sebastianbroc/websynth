@@ -1,8 +1,11 @@
 <template>
   <div class="synth_module">
     <div class="module_label">
-      <h3>VCA</h3>
-      <p>{{ label }}</p>
+      <div>
+        <h3>VCA</h3>
+        <p>{{ label }}</p>
+      </div>
+      <img class="icon" src="@/assets/icons/icon_vca.png">
     </div>
     <div class="controls">
       <div class="control_row">
@@ -11,8 +14,7 @@
       <div class="control_row">
         <Handle id="gain" type="target" class="custom_handle port_input" :position="Position.Left"/><span>control in</span>
       </div>
-      <div class="divider_row">
-      </div>
+      <div class="divider_row"></div>
       <div class="control_row">
         <Handle type="source" class="custom_handle port_output" :position="Position.Bottom"/><span>output</span>
       </div>
@@ -33,17 +35,6 @@ const props = defineProps(['id', 'label'])
 <style scoped>
 span {
   margin-left: 10px;
-}
-
-.controls {
-  display: flex;
-  flex-direction: column;
-
-  .control_row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
 }
 
 h3 {

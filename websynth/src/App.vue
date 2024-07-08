@@ -63,7 +63,7 @@ body {
 }
 
 .port_output {
-  background: var(--c-secondary) !important;
+  background: blue !important;
 }
 
 .divider_row {
@@ -72,5 +72,33 @@ body {
 
 .vue-flow__edges {
   z-index: 1001 !important;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+
+  .control_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
+.module_label {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+
+  .icon {
+    width: 30px;
+  }
+}
+
+.vue-flow__node-output {
+  border: none !important;
+  padding: 0 !important;
+  width: 120px !important;
 }
 </style>

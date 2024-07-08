@@ -1,10 +1,12 @@
 <template>
   <div class="synth_module">
-    <Handle type="target" :position="Position.Top" />
-    <Handle type="source" :position="Position.Bottom" />
+    <!--<Handle type="target" :position="Position.Top" />-->
     <div class="module_label">
-      <h3>Oscillator</h3>
-      <p>{{ label }}</p>
+      <div>
+        <h3>Oscillator</h3>
+        <p>{{ label }}</p>
+      </div>
+      <img class="icon" src="@/assets/icons/icon_oscillator.png">
     </div>
     <div class="controls">
       <div>
@@ -19,6 +21,10 @@
         <option value="square">Square</option>
         <option value="triangle">Triangle</option>
       </select>
+      <div class="divider_row"></div>
+      <div class="control_row">
+        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span>
+      </div>
     </div>
   </div>
 </template>
@@ -82,5 +88,9 @@ p {
   padding: 0;
   color: var(--c-semitransparent);
   font-size: 0.6rem;
+}
+
+input[type=text] {
+  width: 80px;
 }
 </style>
