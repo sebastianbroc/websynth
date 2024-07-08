@@ -40,9 +40,9 @@ body {
 }
 
 @keyframes warning-color {
-  0% {background : var(--warning-one);}
-  50% {background : var(--warning-two);}
-  100% {background : var(--warning-one);}
+  0% {background : var(--warning-one); color: var(--warning-one);}
+  50% {background : var(--warning-two); color: var(--warning-two);}
+  100% {background : var(--warning-one); color: var(--warning-one);}
 }
 
 .synth_module {

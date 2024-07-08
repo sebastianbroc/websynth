@@ -8,7 +8,7 @@
       <img class="icon" src="@/assets/icons/icon_mixer.png">
     </div>
     <div class="controls">
-      <div class="volumes">
+      <div class="volumes" v-if="node.data.volumes">
         <div class="volume_row">
           <Handle id="1" type="target" class="custom_handle port_input" :position="Position.Left" /><input type="number" value="100" min="0" v-model="node.data.volumes[0]" v-on:input="emitChange" ><span :class="{warning: node.data.volumes[0] > 1}"></span>
         </div>

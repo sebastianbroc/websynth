@@ -32,10 +32,12 @@ export default {
 
     this.eventBus.on("navBar-click", (param) => {
       if(param === "start playback"){
+        this.$store.commit('changePlaybackState', true)
         this.mainVolume.connect(this.audioContext.destination)
         this.resetConnectionStatus()
         this.eventBus.emit("getModules", "getModules")
       } else if (param === "pause playback"){
+        this.$store.commit('changePlaybackState', false)
         this.mainVolume.disconnect();
       }
     })
