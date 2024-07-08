@@ -98,7 +98,14 @@ const initial_elements = {
 
 onMounted(() => {
   get("flow").then(value => {
-    let flow = JSON.parse(value)
+    let flow = null
+    if(typeof value !== "undefined"){
+      flow = JSON.parse(value)
+    } else {
+      console.log("created initial elements")
+      flow = initial_elements
+    }
+
     if(flow.nodes.filter(n => n.type === "output").length === 0){ //make sure there always is an output
       flow.nodes.push({id: '4', type: 'output', label: 'Output', position: { x: 500, y: 300 }})
     }
@@ -138,7 +145,14 @@ const getModules = () => {
 
 const initDragAndDrop = () => {
   get("flow").then(value => {
-    let flow = JSON.parse(value)
+    let flow = null
+    console.log(value)
+    if(typeof value !== "undefined"){
+      flow = JSON.parse(value)
+    } else {
+      console.log("created initial elements")
+      flow = initial_elements
+    }
     let max = flow.nodes.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
     max = Math.max(...max)
     initializeId(max === -Infinity ? 0 : max + 1)
