@@ -28,6 +28,17 @@ export default {
   },
   mounted(){
     this.initAudio();
+    this.resetConnectionStatus();
+
+    this.eventBus.on("navBar-click", (param) => {
+      if(param === "start playback"){
+        this.mainVolume.connect(this.audioContext.destination)
+        this.resetConnectionStatus()
+        this.eventBus.emit("getModules", "getModules")
+      } else if (param === "pause playback"){
+        this.mainVolume.disconnect();
+      }
+    })
   },
   methods: {
     initAudio(){
@@ -36,6 +47,11 @@ export default {
       this.mainVolume.connect(this.audioContext.destination);
       this.mainVolume.gain.value = 1.0;
       console.log("initialized audio")
+    },
+    resetConnectionStatus(){
+      this.audioNodeList.forEach(node => {
+        node.connected = false
+      })
     },
     updateElements(value){
       console.log("updating elements")

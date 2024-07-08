@@ -114,6 +114,12 @@ onMounted(() => {
     }
   })
 
+  eventBus.on("getModules", (param) => {
+    if(param === "getModules"){
+      getModules()
+    }
+  })
+
   getModules()
 })
 

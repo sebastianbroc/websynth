@@ -18,6 +18,14 @@
         </div>
       </div>
     </div>
+    <div class="playback_controls">
+      <button @click="emitEvent('pause playback'); this.playing = false;" v-if="playing">
+        <img class="icon" src="@/assets/icons/icon_pause.png"><span>pause</span>
+      </button>
+      <button @click="emitEvent('start playback'); this.playing = true;" v-if="!playing">
+        <img class="icon" src="@/assets/icons/icon_play.png"><span>play</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -25,6 +33,11 @@
 export default {
   name: 'NavBar',
   inject: ["eventBus"],
+  data() {
+    return {
+      playing: false
+    }
+  },
   methods: {
     emitEvent(param){
       this.eventBus.emit("navBar-click", param)
@@ -37,6 +50,9 @@ export default {
 .navbar {
   width: 100vw;
   background: var(--c-tertiary);
+  display: flex;
+  justify-content: space-between;
+  position: relative;
   /*border-bottom: solid 1px black;*/
 }
 
@@ -82,6 +98,30 @@ export default {
       cursor: pointer;
       background: var(--lighten);
     }
+  }
+}
+
+.playback_controls {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  padding: 3px;
+
+  button {
+    cursor: pointer;
+    background: var(--c-secondary);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    border: none;
+
+    &:hover {
+      background: var(--lighten);
+    }
+  }
+
+  .icon {
+    width: 20px;
   }
 }
 </style>
