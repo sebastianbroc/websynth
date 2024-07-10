@@ -12,6 +12,7 @@
         <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">patch</a>
         <div class="options">
           <button @click="emitEvent('save patch to file')">save patch to file</button>
+          <button @click="emitEvent('load patch from file')">load patch from file</button>
         </div>
       </div>
       <div class="category">
@@ -54,7 +55,6 @@ export default {
     },
     hideOtherMenus(e){
       let elements = document.querySelectorAll(".category a")
-      console.log(elements)
       elements.forEach(element => {
         if (element !== e) {
           element.classList.remove("active")
@@ -84,11 +84,17 @@ export default {
     .options {
       display: none;
       position: absolute;
-      background: var(--lighten);
+      background: white;
       padding: 10px;
-      z-index: 1000;
+      z-index: 1001;
+
+      span {
+        font-size: 0.8rem;
+      }
 
       button {
+        text-align: left;
+        font-size: 0.8rem;
         background: none;
         border: none;
         cursor: pointer;

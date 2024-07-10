@@ -1,8 +1,8 @@
 <template>
   <div class="workspace" @drop="onDrop">
     <ModuleBar></ModuleBar>
-    <SaveModal :visible="saveModalVisible"></SaveModal>
-    <p id="downloadAnchorElem" style="display: none;"></p>
+    <SaveModal :visible="saveModalVisible" :type="modalType"></SaveModal>
+    <div class="disable_workspace" :class="{active: store.state.modalOpened}"></div>
     <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" :connect-on-click="true" @nodesChange="getModules" @edgesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
       <MiniMap />
@@ -33,10 +33,12 @@ import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { MiniMap } from '@vue-flow/minimap'
 import {useVueFlow} from '@vue-flow/core';
+import download from 'downloadjs';
 import '@vue-flow/minimap/dist/style.css'
 import ModuleBar from "@/components/ModuleBar.vue"
 import SaveModal from "@/components/SaveModal.vue";
 import {ref, markRaw, onMounted, inject} from 'vue';
+import {useStore} from 'vuex';
 import {set, get} from 'idb-keyval'
 import useDragAndDrop from '@/mixins/useDnD'
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
@@ -45,6 +47,7 @@ import FilterModule from "@/components/synth_modules/FilterModule.vue";
 import MixerModule from "@/components/synth_modules/MixerModule.vue";
 import EnvelopeModule from "@/components/synth_modules/EnvelopeModule.vue";
 import VCAModule from "@/components/synth_modules/VCAModule.vue";
+const store = useStore()
 
 const { toObject, fromObject, onConnect, addEdges } = useVueFlow()
 onConnect(addEdges)
@@ -55,6 +58,7 @@ let vueFlowInstance = null;
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
 const saveModalVisible = ref(false)
+const modalType = ref("")
 
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
@@ -133,15 +137,40 @@ eventBus.on("navBar-click", (param) => {
     getModules()
   } else if (param === 'save patch to file'){
     saveModalVisible.value = true
-    eventBus.on("modal-click-save", (param) => {
-      downloadPatch(param)
-      saveModalVisible.value = false
-    })
+    modalType.value = "save"
+    store.commit('changeModalOpened', true)
+  } else if (param === 'load patch from file'){
+    saveModalVisible.value = true
+    modalType.value = "load"
+    store.commit('changeModalOpened', true)
   }
 })
 
 
+eventBus.on("modal-click-cancel", () => {
+  saveModalVisible.value = false
+  store.commit('changeModalOpened', false)
+})
+
+eventBus.on("modal-click-save", (param) => {
+  downloadPatch(param)
+  saveModalVisible.value = false
+  store.commit('changeModalOpened', false)
+})
+
+eventBus.on("modal-click-load", (param) => {
+  saveModalVisible.value = false
+  store.commit('changeModalOpened', false)
+
+  let flow = JSON.parse(param)
+  fromObject(flow)
+})
+
 const downloadPatch = (exportName) => {
+  console.log("downloading patch now...")
+  download(JSON.stringify(toObject()), exportName + ".json")
+
+  /*
   let exportObj = toObject()
   let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
   let downloadAnchorNode = document.createElement('a');
@@ -149,7 +178,7 @@ const downloadPatch = (exportName) => {
   downloadAnchorNode.setAttribute("download", exportName + ".json");
   document.body.appendChild(downloadAnchorNode); // required for firefox
   downloadAnchorNode.click();
-  downloadAnchorNode.remove();
+  downloadAnchorNode.remove();*/
 }
 
 const setInstance = (instance) => {
@@ -194,6 +223,21 @@ initDragAndDrop()
   position: relative;
   width: 100%;
   height: 90vh;
+}
+
+.disable_workspace {
+  display: none;
+
+  &.active {
+    display: block;
+    background: rgba(0,0,0,0.5);
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+  }
 }
 
 .synth_module {
