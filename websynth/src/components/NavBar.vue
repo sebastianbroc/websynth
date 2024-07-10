@@ -2,17 +2,26 @@
   <div class="navbar">
     <div class="navbar-content one-third">
       <a><b>websynth</b> //</a>
-      <div class="category" @click="e => {e.target.classList.toggle('active');}">
-        <a>home</a>
+      <div class="category">
+        <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">home</a>
+        <div class="options">
+          <span>there is nothing here yet</span>
+        </div>
       </div>
-      <div class="category" @click="e => {e.target.classList.toggle('active');}">
-        <a>files</a>
+      <div class="category">
+        <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">patch</a>
+        <div class="options">
+          <button @click="emitEvent('save patch to file')">save patch to file</button>
+        </div>
       </div>
-      <div class="category" @click="e => {e.target.classList.toggle('active');}">
-        <a>view</a>
+      <div class="category">
+        <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">view</a>
+        <div class="options">
+          <span>there is nothing here yet</span>
+        </div>
       </div>
-      <div class="category" @click="e => {e.target.classList.toggle('active');}">
-        <a>options</a>
+      <div class="category">
+        <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">options</a>
         <div class="options">
           <button @click="emitEvent('reset workspace')">reset workspace</button>
         </div>
@@ -42,6 +51,15 @@ export default {
   methods: {
     emitEvent(param){
       this.eventBus.emit("navBar-click", param)
+    },
+    hideOtherMenus(e){
+      let elements = document.querySelectorAll(".category a")
+      console.log(elements)
+      elements.forEach(element => {
+        if (element !== e) {
+          element.classList.remove("active")
+        }
+      })
     }
   }
 }

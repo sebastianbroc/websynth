@@ -1,6 +1,8 @@
 <template>
   <div class="workspace" @drop="onDrop">
     <ModuleBar></ModuleBar>
+    <SaveModal :visible="saveModalVisible"></SaveModal>
+    <p id="downloadAnchorElem" style="display: none;"></p>
     <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" :connect-on-click="true" @nodesChange="getModules" @edgesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
       <MiniMap />
@@ -33,6 +35,7 @@ import { MiniMap } from '@vue-flow/minimap'
 import {useVueFlow} from '@vue-flow/core';
 import '@vue-flow/minimap/dist/style.css'
 import ModuleBar from "@/components/ModuleBar.vue"
+import SaveModal from "@/components/SaveModal.vue";
 import {ref, markRaw, onMounted, inject} from 'vue';
 import {set, get} from 'idb-keyval'
 import useDragAndDrop from '@/mixins/useDnD'
@@ -51,6 +54,7 @@ let vueFlowInstance = null;
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
+const saveModalVisible = ref(false)
 
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
@@ -113,14 +117,6 @@ onMounted(() => {
     fromObject(flow)
   })
 
-  eventBus.on("navBar-click", (param) => {
-    if(param === "reset workspace"){
-      console.log("resetting workspace...")
-      fromObject(initial_elements)
-      getModules()
-    }
-  })
-
   eventBus.on("getModules", (param) => {
     if(param === "getModules"){
       getModules()
@@ -129,6 +125,32 @@ onMounted(() => {
 
   getModules()
 })
+
+eventBus.on("navBar-click", (param) => {
+  if(param === "reset workspace"){
+    console.log("resetting workspace...")
+    fromObject(initial_elements)
+    getModules()
+  } else if (param === 'save patch to file'){
+    saveModalVisible.value = true
+    eventBus.on("modal-click-save", (param) => {
+      downloadPatch(param)
+      saveModalVisible.value = false
+    })
+  }
+})
+
+
+const downloadPatch = (exportName) => {
+  let exportObj = toObject()
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+  let downloadAnchorNode = document.createElement('a');
+  downloadAnchorNode.setAttribute("href",     dataStr);
+  downloadAnchorNode.setAttribute("download", exportName + ".json");
+  document.body.appendChild(downloadAnchorNode); // required for firefox
+  downloadAnchorNode.click();
+  downloadAnchorNode.remove();
+}
 
 const setInstance = (instance) => {
   console.log("instance has been set")
