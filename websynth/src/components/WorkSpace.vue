@@ -61,7 +61,7 @@ const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
 
-let {startConnection} = useWebsocket()
+let {startConnection, createSession, joinSession} = useWebsocket()
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
@@ -193,8 +193,15 @@ eventBus.on("modal-click-load", (param) => {
 })
 
 eventBus.on("modal-click-start_collaboration", (param) => {
-  console.log(param)
-  startConnection(param)
+  startConnection(() => {
+    createSession(param)
+  })
+})
+
+eventBus.on("modal-click-join_collaboration", (id) => {
+  startConnection(() => {
+    joinSession(id)
+  })
 })
 
 const updateCursorPosition = (id) => {

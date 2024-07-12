@@ -5,7 +5,8 @@ export default createStore({
     playbackHalted: false,
     modalOpened: false,
     websocketConnected: false,
-    sessionID: null
+    sessionID: null,
+    error: null
   },
   getters: {
   },
@@ -21,6 +22,9 @@ export default createStore({
     },
     changeSessionID(state, p) {
       state.sessionID = p
+    },
+    changeError(state, p) {
+      state.error = p
     }
   },
   actions: {

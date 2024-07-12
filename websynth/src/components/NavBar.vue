@@ -161,7 +161,8 @@ export default {
 
 .websocket-status {
   display: flex;
-  justify-content: center;
+  justify-content: end;
+  padding-right: 10px;
   align-items: center;
   gap: 10px;
 

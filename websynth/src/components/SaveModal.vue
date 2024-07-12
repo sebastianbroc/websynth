@@ -6,8 +6,8 @@
         <input type="text" id="patchname" placeholder="My Patch" v-model="patchname"><span class="file-ending">.json</span>
       </div>
       <div class="buttonWrapper">
-        <button @click="emitEvent('cancel')" class="cancel">cancel</button>
-        <button @click="emitEvent('save')" :disabled="!patchname">save</button>
+        <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
+        <button @click="emitEvent('save', true)" :disabled="!patchname">save</button>
       </div>
     </div>
     <div class="modal loadmodal" :class="{visible: visible && type === 'load'}">
@@ -16,28 +16,58 @@
         <input type="file" id="patchfile" @change="loadFile">
       </div>
       <div class="buttonWrapper">
-        <button @click="emitEvent('cancel')" class="cancel">cancel</button>
-        <button @click="emitEvent('load')">load</button>
+        <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
+        <button @click="emitEvent('load', true)">load</button>
       </div>
     </div>
-    <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID}">
-      <h2>Start Collaboration</h2>
-      <div class="text_input">
-        <input type="password" v-model="password" placeholder="session password"><br>
-        <input type="password" v-model="retypePassword" placeholder="repeat password"><br>
-        <p class="help_text">Set a password if you want to limit access to your session.<br>Otherwise, leave the fields blank.</p>
+    <div v-if="type === 'start_collaboration'">
+      <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && !collaboration_type}">
+        <h2>Collaborate</h2>
+        <div class="choice_buttons">
+          <button @click="collaboration_type = 'create'"><img src="@/assets/add.svg"><p>Create new Session</p></button>
+          <button @click="collaboration_type = 'join'"><img src="@/assets/join.svg"><p>Join Session</p></button>
+        </div>
+        <div class="buttonWrapper">
+          <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
+        </div>
       </div>
-      <div class="buttonWrapper">
-        <button @click="emitEvent('cancel')" class="cancel">cancel</button>
-        <button @click="emitEvent('start_collaboration_button')" :disabled="(password || retypePassword) && (password !== retypePassword)">start collaborating</button>
+      <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && collaboration_type === 'create'}">
+        <h2>Start Collaboration</h2>
+        <div class="text_input">
+          <input type="password" v-model="password" placeholder="session password"><br>
+          <input type="password" v-model="retypePassword" placeholder="repeat password"><br>
+          <p class="help_text">Set a password if you want to limit access to your session.<br>Otherwise, leave the fields blank.</p>
+        </div>
+        <div class="buttonWrapper">
+          <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
+          <button @click="emitEvent('start_collaboration_button', true)" :disabled="(password || retypePassword) && (password !== retypePassword)">start collaborating</button>
+        </div>
+      </div>
+      <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && collaboration_type === 'join'}">
+        <h2>Join Session</h2>
+        <div class="text_input">
+          <input type="text" v-model="existingSessionID" placeholder="session id"><p class="help_text error">{{store().state.error ?? null}}</p><br>
+          <p class="help_text">Enter the Session ID you got from the host to join.</p>
+        </div>
+        <div class="buttonWrapper">
+          <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
+          <button @click="emitEvent('join_collaboration_button')" :disabled="!existingSessionID">join</button>
+        </div>
       </div>
     </div>
-    <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && store().state.sessionID}">
+    <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && store().state.sessionID && collaboration_type === 'create'}">
       <h2>Your Session has been successfully created!</h2>
       <p>Your Session ID is: <b>{{store().state.sessionID}}</b></p>
       <p>Use this link to invite collaborators: <i>{{"http://test.com/?session=" + store().state.sessionID}}</i></p>
       <div class="buttonWrapper">
-        <button @click="emitEvent('cancel')" class="finish">start patching</button>
+        <button @click="emitEvent('cancel', true)" class="finish">start patching</button>
+      </div>
+    </div>
+    <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && store().state.sessionID && collaboration_type === 'join'}">
+      <h2>You have successfully joined the Session!</h2>
+      <p>You are now Part of the Session <b>{{store().state.sessionID}}</b>!</p>
+      <div class="buttonWrapper">
+        <button @click="emitEvent('cancel', true)" class="finish">start patching</button>
       </div>
     </div>
   </div>
@@ -54,25 +84,29 @@ export default {
       patchname: null,
       patch: null,
       password: null,
-      retypePassword: null
+      retypePassword: null,
+      collaboration_type: null,
+      existingSessionID: null
     }
   },
   methods: {
     store(){
       return store
     },
-    emitEvent(type){
+    emitEvent(type, reset){
       if(type === "save"){
         this.eventBus.emit("modal-click-save", this.patchname)
       } else if (type === "load"){
         this.eventBus.emit("modal-click-load", this.patch)
       } else if (type === "start_collaboration_button"){
         this.eventBus.emit("modal-click-start_collaboration", this.password)
+      } else if(type === "join_collaboration_button"){
+        this.eventBus.emit("modal-click-join_collaboration", this.existingSessionID)
       } else if (type === "cancel"){
         this.eventBus.emit("modal-click-cancel")
       }
 
-      this.resetFields()
+      if(reset) this.resetFields()
     },
     loadFile(e){
       let files = e.target.files || e.dataTransfer.files;
@@ -91,6 +125,8 @@ export default {
       this.patchname = null
       this.password = null
       this.retypePassword = null
+      this.collaboration_type = null
+      this.existingSessionID = null
     }
   }
 }
@@ -121,7 +157,7 @@ export default {
     font-family: monospace;
   }
 
-  #patchname, .file-ending, input[type=password] {
+  #patchname, .file-ending, input {
     background: transparent;
     font-size: 1.2rem;
     font-family: monospace;
@@ -161,6 +197,33 @@ export default {
 
   .help_text {
     font-family: monospace;
+    margin-top: 10px;
+
+    &.error {
+      color: red;
+    }
+  }
+
+  .choice_buttons {
+    display: flex;
+    gap: 10px;
+
+    button {
+      cursor: pointer;
+      width: 50%;
+      background: none;
+      border: solid 2px;
+      outline: none;
+
+      &:hover {
+        background: white;
+      }
+
+      img {
+        filter: invert(100%);
+        width: 80px;
+      }
+    }
   }
 }
 </style>

@@ -3,25 +3,26 @@ import {useStore} from "vuex";
 
 export default function useWebsocket() {
     let socket = null
-    let password = null
     const store = useStore()
 
     const socketConnected = ref(false)
 
-    function startConnection(pass){
+    function startConnection(callback){
         socket = new WebSocket("ws://localhost:8085")
 
-        socket.onopen = onSocketOpen
+        socket.onopen = () => {
+            callback()
+        }
         socket.onmessage = onSocketMessage
         socket.onclose = onSocketClose
-
-        password = pass
     }
 
-    function onSocketOpen(evt){
-        console.log(evt)
-        socketConnected.value = true
-        socket.send(JSON.stringify({msg: "new session", password: password}))
+    function createSession(pass){
+        socket.send(JSON.stringify({msg: "new session", password: pass}))
+    }
+
+    function joinSession(id){
+        socket.send(JSON.stringify({msg: "join session", id: id}))
     }
 
     function onSocketMessage(evt){
@@ -33,9 +34,12 @@ export default function useWebsocket() {
         }
 
 
-        if(data.new_session_id){
+        if(data.session_id){
             store.commit('changeWebsocketConnected', true)
-            store.commit('changeSessionID', data.new_session_id)
+            store.commit('changeSessionID', data.session_id)
+        } else if (data.error){
+            store.commit('changeError', data.error)
+            socket.close()
         }
         //console.log(evt.data)
     }
@@ -47,6 +51,7 @@ export default function useWebsocket() {
 
     return {
         startConnection,
-        socketConnected
+        createSession,
+        joinSession
     }
 }
