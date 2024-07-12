@@ -103,4 +103,8 @@ body {
   width: 120px !important;
   --vf-box-shadow: none !important;
 }
+
+.vue-flow__node-cursor {
+  transition: transform 0.4s;
+}
 </style>

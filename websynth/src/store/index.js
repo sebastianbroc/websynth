@@ -3,7 +3,9 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     playbackHalted: false,
-    modalOpened: false
+    modalOpened: false,
+    websocketConnected: false,
+    sessionID: "abcdefg"
   },
   getters: {
   },
@@ -13,6 +15,12 @@ export default createStore({
     },
     changeModalOpened(state, p) {
       state.modalOpened = p
+    },
+    changeWebsocketConnected(state, p) {
+      state.websocketConnected = p
+    },
+    changeSessionID(state, p) {
+      state.sessionID = p
     }
   },
   actions: {

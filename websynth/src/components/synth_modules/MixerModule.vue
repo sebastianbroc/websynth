@@ -64,7 +64,7 @@ let emitChange = () => {
   gap: 10px;
 
   .volume_row {
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 10px;
 

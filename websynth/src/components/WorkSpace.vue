@@ -1,5 +1,6 @@
 <template>
   <div class="workspace" @drop="onDrop">
+    <button @click="updateCursorPosition('2')">Update</button>
     <ModuleBar></ModuleBar>
     <SaveModal :visible="saveModalVisible" :type="modalType"></SaveModal>
     <div class="disable_workspace" :class="{active: store.state.modalOpened}"></div>
@@ -24,6 +25,9 @@
       <template #node-vca="customNodeProps">
         <VCAModule v-bind="customNodeProps" @moduleChanged="getModules" />
       </template>
+      <template #node-cursor="customNodeProps">
+        <CursorModule v-bind="customNodeProps" @moduleChanged="getModules" />
+      </template>
     </VueFlow>
   </div>
 </template>
@@ -41,19 +45,23 @@ import {ref, markRaw, onMounted, inject} from 'vue';
 import {useStore} from 'vuex';
 import {set, get} from 'idb-keyval'
 import useDragAndDrop from '@/mixins/useDnD'
+import useWebsocket from "@/mixins/websocketHandler";
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
 import OutputModule from "@/components/synth_modules/OutputModule.vue";
 import FilterModule from "@/components/synth_modules/FilterModule.vue";
 import MixerModule from "@/components/synth_modules/MixerModule.vue";
 import EnvelopeModule from "@/components/synth_modules/EnvelopeModule.vue";
 import VCAModule from "@/components/synth_modules/VCAModule.vue";
+import CursorModule from "@/components/synth_modules/CursorModule.vue";
 const store = useStore()
 
-const { toObject, fromObject, onConnect, addEdges } = useVueFlow()
+const { toObject, fromObject, onConnect, addEdges, updateNode } = useVueFlow()
 onConnect(addEdges)
 const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
+
+useWebsocket()
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
@@ -66,7 +74,8 @@ const nodeTypes = {
   filter: markRaw(FilterModule),
   mixer: markRaw(MixerModule),
   envelope: markRaw(EnvelopeModule),
-  vca: markRaw(VCAModule)
+  vca: markRaw(VCAModule),
+  cursor: markRaw(CursorModule),
 }
 
 let elements = ref([
@@ -89,6 +98,19 @@ const initial_elements = {
       },
       "data": {},
       "label": "Output"
+    },
+    {
+      "id": "2",
+      "type": "cursor",
+      "position": {
+        "x": 200,
+        "y": 200
+      },
+      "data": {
+        "color": "#ff0000",
+        "username": "Max Muster"
+      },
+      "label": "Cursor"
     }
   ],
   "edges": [],
@@ -166,19 +188,13 @@ eventBus.on("modal-click-load", (param) => {
   fromObject(flow)
 })
 
+const updateCursorPosition = (id) => {
+  updateNode(id, {position: {x: 300, y: 400}})
+}
+
 const downloadPatch = (exportName) => {
   console.log("downloading patch now...")
   download(JSON.stringify(toObject()), exportName + ".json")
-
-  /*
-  let exportObj = toObject()
-  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
-  let downloadAnchorNode = document.createElement('a');
-  downloadAnchorNode.setAttribute("href",     dataStr);
-  downloadAnchorNode.setAttribute("download", exportName + ".json");
-  document.body.appendChild(downloadAnchorNode); // required for firefox
-  downloadAnchorNode.click();
-  downloadAnchorNode.remove();*/
 }
 
 const setInstance = (instance) => {

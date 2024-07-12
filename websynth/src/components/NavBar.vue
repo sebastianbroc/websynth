@@ -36,11 +36,14 @@
         <img class="icon" src="@/assets/icons/icon_play.png"><span>play</span>
       </button>
     </div>
-    <div class="one-third"></div>
+    <div class="websocket-status one-third">
+      <div v-if="store().state.websocketConnected" id="connected"></div><div v-else id="disconnected"></div><p>Session {{store().state.websocketConnected ? store().state.sessionID: 'disconnected'}}</p>
+    </div>
   </div>
 </template>
 
 <script>
+import store from "@/store";
 export default {
   name: 'NavBar',
   inject: ["eventBus"],
@@ -50,6 +53,9 @@ export default {
     }
   },
   methods: {
+    store() {
+      return store
+    },
     emitEvent(param){
       this.eventBus.emit("navBar-click", param)
     },
@@ -147,6 +153,32 @@ export default {
 
   .icon {
     width: 20px;
+  }
+}
+
+.websocket-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  p {
+    font-family: monospace;
+    margin: 0;
+  }
+
+  div {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+
+    &#connected {
+      background: green;
+    }
+
+    &#disconnected {
+      background: red;
+    }
   }
 }
 
