@@ -61,7 +61,7 @@ const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
 
-useWebsocket()
+let {startConnection} = useWebsocket()
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
@@ -165,6 +165,10 @@ eventBus.on("navBar-click", (param) => {
     saveModalVisible.value = true
     modalType.value = "load"
     store.commit('changeModalOpened', true)
+  } else if (param === 'start collaboration'){
+    saveModalVisible.value = true
+    store.commit('changeModalOpened', true)
+    modalType.value = "start_collaboration"
   }
 })
 
@@ -186,6 +190,11 @@ eventBus.on("modal-click-load", (param) => {
 
   let flow = JSON.parse(param)
   fromObject(flow)
+})
+
+eventBus.on("modal-click-start_collaboration", (param) => {
+  console.log(param)
+  startConnection(param)
 })
 
 const updateCursorPosition = (id) => {

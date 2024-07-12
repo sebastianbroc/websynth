@@ -5,7 +5,7 @@ export default createStore({
     playbackHalted: false,
     modalOpened: false,
     websocketConnected: false,
-    sessionID: "abcdefg"
+    sessionID: null
   },
   getters: {
   },

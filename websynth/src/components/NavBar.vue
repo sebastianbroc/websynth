@@ -37,7 +37,10 @@
       </button>
     </div>
     <div class="websocket-status one-third">
-      <div v-if="store().state.websocketConnected" id="connected"></div><div v-else id="disconnected"></div><p>Session {{store().state.websocketConnected ? store().state.sessionID: 'disconnected'}}</p>
+      <button v-if="!store().state.websocketConnected" class="collaborate" @click="emitEvent('start collaboration')"><img src="@/assets/collaborate.svg"> Collaborate</button>
+      <div class="connection_status" v-if="store().state.websocketConnected">
+        <div v-if="store().state.websocketConnected" id="connected"></div><div v-else id="disconnected"></div><p>Session {{store().state.websocketConnected ? store().state.sessionID: 'disconnected'}}</p>
+      </div>
     </div>
   </div>
 </template>
@@ -167,17 +170,42 @@ export default {
     margin: 0;
   }
 
-  div {
-    width: 10px;
-    height: 10px;
-    border-radius: 100%;
+  .connection_status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 
-    &#connected {
-      background: green;
+    div {
+      width: 10px;
+      height: 10px;
+      border-radius: 100%;
+
+      &#connected {
+        background: green;
+      }
+
+      &#disconnected {
+        background: red;
+      }
+    }
+  }
+
+  .collaborate {
+    cursor: pointer;
+    background: var(--c-secondary);
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    &:hover {
+      background: white;
     }
 
-    &#disconnected {
-      background: red;
+    img {
+      filter: invert(100%);
     }
   }
 }
