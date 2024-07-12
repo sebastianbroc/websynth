@@ -40,13 +40,15 @@
         </div>
         <div class="buttonWrapper">
           <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
-          <button @click="emitEvent('start_collaboration_button', true)" :disabled="(password || retypePassword) && (password !== retypePassword)">start collaborating</button>
+          <button @click="emitEvent('start_collaboration_button')" :disabled="(password || retypePassword) && (password !== retypePassword)">start collaborating</button>
         </div>
       </div>
       <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && collaboration_type === 'join'}">
         <h2>Join Session</h2>
         <div class="text_input">
-          <input type="text" v-model="existingSessionID" placeholder="session id"><p class="help_text error">{{store().state.error ?? null}}</p><br>
+          <input type="text" v-model="existingSessionID" placeholder="session id"><br>
+          <input type="password" v-model="password" placeholder="session password"><br>
+          <p class="help_text error" v-if="store().state.error">{{store().state.error}}</p>
           <p class="help_text">Enter the Session ID you got from the host to join.</p>
         </div>
         <div class="buttonWrapper">
@@ -101,7 +103,7 @@ export default {
       } else if (type === "start_collaboration_button"){
         this.eventBus.emit("modal-click-start_collaboration", this.password)
       } else if(type === "join_collaboration_button"){
-        this.eventBus.emit("modal-click-join_collaboration", this.existingSessionID)
+        this.eventBus.emit("modal-click-join_collaboration", {id: this.existingSessionID, password: this.password})
       } else if (type === "cancel"){
         this.eventBus.emit("modal-click-cancel")
       }
@@ -222,6 +224,10 @@ export default {
       img {
         filter: invert(100%);
         width: 80px;
+      }
+
+      p {
+        margin-bottom: 5px;
       }
     }
   }

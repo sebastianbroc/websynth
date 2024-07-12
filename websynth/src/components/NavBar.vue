@@ -37,7 +37,7 @@
       </button>
     </div>
     <div class="websocket-status one-third">
-      <button v-if="!store().state.websocketConnected" class="collaborate" @click="emitEvent('start collaboration')"><img src="@/assets/collaborate.svg"> Collaborate</button>
+      <button v-if="!store().state.websocketConnected" class="collaborate" @click="emitEvent('start collaboration')"><img src="@/assets/collaborate.svg">collaborate</button>
       <div class="connection_status" v-if="store().state.websocketConnected">
         <div v-if="store().state.websocketConnected" id="connected"></div><div v-else id="disconnected"></div><p>Session <b>{{store().state.websocketConnected ? store().state.sessionID: 'disconnected'}}</b></p>
       </div>
