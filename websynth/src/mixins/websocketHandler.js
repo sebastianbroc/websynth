@@ -37,7 +37,7 @@ export default function useWebsocket() {
             store.commit('changeWebsocketConnected', true)
             store.commit('changeSessionID', data.new_session_id)
         }
-        console.log(evt.data)
+        //console.log(evt.data)
     }
 
     function onSocketClose(){

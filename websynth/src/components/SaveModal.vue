@@ -37,7 +37,7 @@
       <p>Your Session ID is: <b>{{store().state.sessionID}}</b></p>
       <p>Use this link to invite collaborators: <i>{{"http://test.com/?session=" + store().state.sessionID}}</i></p>
       <div class="buttonWrapper">
-        <button @click="emitEvent('cancel')" class="finish">finish</button>
+        <button @click="emitEvent('cancel')" class="finish">start patching</button>
       </div>
     </div>
   </div>
