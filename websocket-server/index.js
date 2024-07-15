@@ -52,6 +52,10 @@ wss.on('connection', function connection(ws) {
             }
         }
     });
+
+    ws.on("close", () => {
+        removeOrphans()
+    })
 });
 
 function makeid(length) {
@@ -70,4 +74,19 @@ function makeid(length) {
     }
 
     return result;
+}
+
+function removeOrphans(){
+    sessions.forEach((session, index) => {
+        session.users.forEach((user, userindex) => {
+            if (user.readyState === 3){
+                session.users.splice(userindex, 1)
+            }
+        })
+
+        if(session.users.length === 0){
+            console.log("deleting orphaned session " + session.id + "...")
+            sessions.splice(index, 1)
+        }
+    })
 }
