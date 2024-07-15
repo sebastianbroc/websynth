@@ -28,13 +28,14 @@ export default function useWebsocket() {
 
     function sendFullArray(elements){
         if(socket){
-            socket.send(JSON.stringify({msg: "update elements", elements: JSON.stringify(elements)}))
+            console.log(elements)
+            //socket.send(JSON.stringify({msg: "update elements", elements: JSON.stringify(elements)}))
         }
     }
 
-    function sendChange(change){
+    function sendChange(change, type){
         if(socket){
-            socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change)}))
+            socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change), type: type}))
         }
     }
 
@@ -60,6 +61,8 @@ export default function useWebsocket() {
             socket.close()
         } else if (data.element_update){
             eventBus.emit("element_update", data.element_update)
+        } else if (data.change){
+            eventBus.emit("node_change", {type: data.type, change: data.change})
         }
     }
 

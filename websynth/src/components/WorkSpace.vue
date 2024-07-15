@@ -4,29 +4,29 @@
     <ModuleBar></ModuleBar>
     <SaveModal :visible="saveModalVisible" :type="modalType"></SaveModal>
     <div class="disable_workspace" :class="{active: store.state.modalOpened}"></div>
-    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" :connect-on-click="true" @nodesChange="getModules" @edgesChange="getModules" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
+    <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" :connect-on-click="true" @nodesChange="getModules($event, 'nodes')" @edgesChange="getModules($event, 'edges')" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
       <MiniMap />
       <template #node-oscillator="customNodeProps">
-        <OscillatorModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <OscillatorModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-filter="customNodeProps">
-        <FilterModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <FilterModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-output="customNodeProps">
-        <OutputModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <OutputModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-mixer="customNodeProps">
-        <MixerModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <MixerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-envelope="customNodeProps">
-        <EnvelopeModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <EnvelopeModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-vca="customNodeProps">
-        <VCAModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <VCAModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-cursor="customNodeProps">
-        <CursorModule v-bind="customNodeProps" @moduleChanged="getModules" />
+        <CursorModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
     </VueFlow>
   </div>
@@ -55,7 +55,7 @@ import VCAModule from "@/components/synth_modules/VCAModule.vue";
 import CursorModule from "@/components/synth_modules/CursorModule.vue";
 const store = useStore()
 
-const { toObject, fromObject, onConnect, addEdges, updateNode } = useVueFlow()
+const { toObject, fromObject, onConnect, addEdges, updateNode, applyNodeChanges, applyEdgeChanges } = useVueFlow()
 onConnect(addEdges)
 const eventBus = inject("eventBus")
 
@@ -211,6 +211,27 @@ eventBus.on("element_update", (elements) => {
   emit('updateElements', elements)
 })
 
+eventBus.on("node_change", (change) => {
+  if(change.type === "nodes"){
+    applyNodeChanges([JSON.parse(change.change)])
+  } else if (change.type === "edges") {
+    applyEdgeChanges([JSON.parse(change.change)])
+  } else if(change.type === "data"){
+    change = JSON.parse(change.change)
+
+    let nodes = toObject()
+    nodes.nodes.forEach(node => {
+      if(node.id === change.id){
+        node.data = change.data
+      }
+    })
+    fromObject(nodes)
+  }
+
+  let elements = vueFlowInstance.getElements
+  emit('updateElements', elements)
+})
+
 const updateCursorPosition = (id) => {
   updateNode(id, {position: {x: 300, y: 400}})
 }
@@ -225,7 +246,7 @@ const setInstance = (instance) => {
   vueFlowInstance = instance
   getModules()
 }
-const getModules = (changes) => {
+const getModules = (changes, type) => {
   if (vueFlowInstance) {
     let elements = vueFlowInstance.getElements
     emit('updateElements', elements)
@@ -235,8 +256,7 @@ const getModules = (changes) => {
 
       if(changes && Array.isArray(changes))
       changes.forEach(change => {
-        console.log(change)
-        sendChange(change)
+        sendChange(change, type)
       })
     }
   }

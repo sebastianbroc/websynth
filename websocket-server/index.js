@@ -15,7 +15,7 @@ wss.on('connection', function connection(ws) {
             switch(data.msg){
                 case "new session":
                     let newSessionID = makeid(5)
-                    console.log("creating new session with id " + newSessionID);
+                    console.log("\x1b[32m creating new session with id \x1b[34m" + newSessionID + "\x1b[0m");
 
                     sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [ws], "patch": data.patch})
                     ws.send(JSON.stringify({"session_id": newSessionID}))
@@ -53,7 +53,7 @@ wss.on('connection', function connection(ws) {
                     let activeSession = sessions.filter(s => s.users.includes(ws))[0]
                     activeSession.users.forEach(user => {
                         if(user !== ws){ //do not send changes back to sender
-                            user.send(JSON.stringify({"change": data.element}))
+                            user.send(JSON.stringify({"change": data.element, "type": data.type}))
                         }
                     })
                     break;
@@ -93,7 +93,7 @@ function removeOrphans(){
         })
 
         if(session.users.length === 0){
-            console.log("deleting orphaned session " + session.id + "...")
+            console.log("\x1b[31m deleting orphaned session " + session.id + "...\x1b[0m")
             sessions.splice(index, 1)
         }
     })

@@ -49,7 +49,7 @@ onMounted(() => {
 })
 
 let emitChange = () => {
-  emit('moduleChanged')
+  emit('moduleChanged', [{id: props.id, data: node.data}])
 }
 
 </script>
