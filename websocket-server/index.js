@@ -17,7 +17,7 @@ wss.on('connection', function connection(ws) {
                     let newSessionID = makeid(5)
                     console.log("creating new session with id " + newSessionID);
 
-                    sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [ws]})
+                    sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [ws], "patch": data.patch})
                     ws.send(JSON.stringify({"session_id": newSessionID}))
                     break;
                 case "join session":
@@ -30,13 +30,13 @@ wss.on('connection', function connection(ws) {
                         if(session.password_protected){
                             if(session.password === data.password){
                                 session.users.push(ws)
-                                ws.send(JSON.stringify({"session_id": session.id}))
+                                ws.send(JSON.stringify({"session_id": session.id, "patch": session.patch}))
                             } else {
                                 ws.send(JSON.stringify({"error": "The Session exists, but the password you entered is wrong."}))
                             }
                         } else {
                             session.users.push(ws)
-                            ws.send(JSON.stringify({"session_id": session.id}))
+                            ws.send(JSON.stringify({"session_id": session.id, "patch": session.patch}))
                         }
                     }
                     break;
@@ -46,6 +46,14 @@ wss.on('connection', function connection(ws) {
                     session.users.forEach(user => {
                         if(user !== ws){ //do not send changes back to sender
                             user.send(JSON.stringify({"element_update": data.elements}))
+                        }
+                    })
+                    break;
+                case "change element":
+                    let activeSession = sessions.filter(s => s.users.includes(ws))[0]
+                    activeSession.users.forEach(user => {
+                        if(user !== ws){ //do not send changes back to sender
+                            user.send(JSON.stringify({"change": data.element}))
                         }
                     })
                     break;

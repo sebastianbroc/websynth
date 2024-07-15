@@ -61,7 +61,7 @@ const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
 
-let {startConnection, createSession, joinSession, sendChanges} = useWebsocket()
+let {startConnection, createSession, joinSession, sendFullArray, sendChange} = useWebsocket()
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
@@ -194,7 +194,7 @@ eventBus.on("modal-click-load", (param) => {
 
 eventBus.on("modal-click-start_collaboration", (param) => {
   startConnection(() => {
-    createSession(param)
+    createSession(param, JSON.stringify(toObject()))
   })
 })
 
@@ -225,12 +225,20 @@ const setInstance = (instance) => {
   vueFlowInstance = instance
   getModules()
 }
-const getModules = () => {
+const getModules = (changes) => {
   if (vueFlowInstance) {
     let elements = vueFlowInstance.getElements
     emit('updateElements', elements)
     set("flow", JSON.stringify(toObject()))
-    if(store.state.websocketConnected) sendChanges(toObject())
+    if(store.state.websocketConnected){
+      sendFullArray(toObject())
+
+      if(changes && Array.isArray(changes))
+      changes.forEach(change => {
+        console.log(change)
+        sendChange(change)
+      })
+    }
   }
 }
 

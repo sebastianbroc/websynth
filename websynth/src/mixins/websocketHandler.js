@@ -18,17 +18,23 @@ export default function useWebsocket() {
         socket.onclose = onSocketClose
     }
 
-    function createSession(pass){
-        socket.send(JSON.stringify({msg: "new session", password: pass}))
+    function createSession(pass, patch){
+        socket.send(JSON.stringify({msg: "new session", password: pass, patch: patch}))
     }
 
     function joinSession(id, pass){
         socket.send(JSON.stringify({msg: "join session", id: id, password: pass}))
     }
 
-    function sendChanges(elements){
+    function sendFullArray(elements){
         if(socket){
             socket.send(JSON.stringify({msg: "update elements", elements: JSON.stringify(elements)}))
+        }
+    }
+
+    function sendChange(change){
+        if(socket){
+            socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change)}))
         }
     }
 
@@ -44,6 +50,11 @@ export default function useWebsocket() {
         if(data.session_id){
             store.commit('changeWebsocketConnected', true)
             store.commit('changeSessionID', data.session_id)
+
+            if(data.patch){
+                console.log("received initial patch")
+                eventBus.emit("element_update", data.patch)
+            }
         } else if (data.error){
             store.commit('changeError', data.error)
             socket.close()
@@ -62,6 +73,7 @@ export default function useWebsocket() {
         startConnection,
         createSession,
         joinSession,
-        sendChanges
+        sendFullArray,
+        sendChange
     }
 }

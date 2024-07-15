@@ -101,7 +101,7 @@ export default {
               audioNode.module.connect(targetAudioNode.module[parseInt(target.targetHandle)])
               break;
             default:
-              if(target.targetHandle){
+              if(target.targetHandle && targetAudioNode){
                 console.log("connecting to custom target")
                 console.log(target.targetHandle)
                 if(target.targetHandle === "main"){
@@ -190,7 +190,7 @@ export default {
             if(isNewNode){
               Node = this.audioContext.createOscillator()
             }
-            if(module.data.frequency){
+            if(module.data.frequency && Node.frequency){
               Node.frequency.value = module.data.frequency
               Node.type = module.data.waveform
               createdNewNode = true

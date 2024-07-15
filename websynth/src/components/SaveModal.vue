@@ -50,6 +50,7 @@
           <input type="password" v-model="password" placeholder="session password"><br>
           <p class="help_text error" v-if="store().state.error">{{store().state.error}}</p>
           <p class="help_text">Enter the Session ID you got from the host to join.</p>
+          <p class="help_text"><b class="help_text error">Warning:</b> Your current patch will get overwritten by the remote session's patch. Save your patch before joining if you want to keep it!</p>
         </div>
         <div class="buttonWrapper">
           <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
