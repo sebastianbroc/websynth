@@ -207,6 +207,8 @@ eventBus.on("modal-click-join_collaboration", (param) => {
 eventBus.on("element_update", (elements) => {
   elements = elements.toString()
   fromObject(JSON.parse(elements))
+  elements = vueFlowInstance.getElements
+  emit('updateElements', elements)
 })
 
 const updateCursorPosition = (id) => {
@@ -227,8 +229,8 @@ const getModules = () => {
   if (vueFlowInstance) {
     let elements = vueFlowInstance.getElements
     emit('updateElements', elements)
-    sendChanges(toObject())
     set("flow", JSON.stringify(toObject()))
+    if(store.state.websocketConnected) sendChanges(toObject())
   }
 }
 

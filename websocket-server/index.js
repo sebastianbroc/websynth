@@ -11,41 +11,46 @@ wss.on('connection', function connection(ws) {
         data = data.toString()
         data = JSON.parse(data)
 
-        if(data.msg && data.msg === "new session"){
-            let newSessionID = makeid(5)
-            console.log("creating new session with id " + newSessionID);
+        if(data.msg){
+            switch(data.msg){
+                case "new session":
+                    let newSessionID = makeid(5)
+                    console.log("creating new session with id " + newSessionID);
 
-            sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [ws]})
-            ws.send(JSON.stringify({"session_id": newSessionID}))
-        } else if(data.msg && data.msg === "join session"){
-            if(sessions.filter(s => s.id === data.id).length === 0){
-                ws.send(JSON.stringify({"error": "There is no Session with this ID!"}))
-            } else {
-                //session exists
-                let session = sessions.filter(s => s.id === data.id)[0]
-
-                if(session.password_protected){
-                    if(session.password === data.password){
-                        session.users.push(ws)
-                        ws.send(JSON.stringify({"session_id": session.id}))
+                    sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [ws]})
+                    ws.send(JSON.stringify({"session_id": newSessionID}))
+                    break;
+                case "join session":
+                    if(sessions.filter(s => s.id === data.id).length === 0){
+                        ws.send(JSON.stringify({"error": "There is no Session with this ID!"}))
                     } else {
-                        ws.send(JSON.stringify({"error": "The Session exists, but the password you entered is wrong."}))
-                    }
-                } else {
-                    session.users.push(ws)
-                    ws.send(JSON.stringify({"session_id": session.id}))
-                }
-            }
-        } else if (data.msg && data.msg === "update elements"){
-            let session = sessions.filter(s => s.users.includes(ws))[0]
+                        //session exists
+                        let session = sessions.filter(s => s.id === data.id)[0]
 
-            session.users.forEach(user => {
-                if(user !== ws){ //do not send changes back to sender
-                    user.send(JSON.stringify({"element_update": data.elements}))
-                }
-            })
+                        if(session.password_protected){
+                            if(session.password === data.password){
+                                session.users.push(ws)
+                                ws.send(JSON.stringify({"session_id": session.id}))
+                            } else {
+                                ws.send(JSON.stringify({"error": "The Session exists, but the password you entered is wrong."}))
+                            }
+                        } else {
+                            session.users.push(ws)
+                            ws.send(JSON.stringify({"session_id": session.id}))
+                        }
+                    }
+                    break;
+                case "update elements":
+                    let session = sessions.filter(s => s.users.includes(ws))[0]
+
+                    session.users.forEach(user => {
+                        if(user !== ws){ //do not send changes back to sender
+                            user.send(JSON.stringify({"element_update": data.elements}))
+                        }
+                    })
+                    break;
+            }
         }
-        //console.log(data)
     });
 });
 

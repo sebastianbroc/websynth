@@ -55,6 +55,7 @@ export default function useWebsocket() {
     function onSocketClose(){
         socketConnected.value = false
         store.commit('changeWebsocketConnected', false)
+        store.commit('changeSessionID', null)
     }
 
     return {

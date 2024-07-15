@@ -24,7 +24,7 @@
       <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && !collaboration_type}">
         <h2>Collaborate</h2>
         <div class="choice_buttons">
-          <button @click="collaboration_type = 'create'"><img src="@/assets/add.svg"><p>Create new Session</p></button>
+          <button @click="collaboration_type = 'create'"><img src="@/assets/add.svg"><p>Create Session</p></button>
           <button @click="collaboration_type = 'join'"><img src="@/assets/join.svg"><p>Join Session</p></button>
         </div>
         <div class="buttonWrapper">
@@ -227,7 +227,8 @@ export default {
       }
 
       p {
-        margin-bottom: 5px;
+        margin: 5px;
+        white-space: nowrap;
       }
     }
   }
