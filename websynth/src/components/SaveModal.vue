@@ -21,7 +21,7 @@
       </div>
     </div>
     <div v-if="type === 'start_collaboration'">
-      <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && !collaboration_type}">
+      <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && !collaboration_type && !session}">
         <h2>Collaborate</h2>
         <div class="choice_buttons">
           <button @click="collaboration_type = 'create'"><img src="@/assets/add.svg"><p>Create Session</p></button>
@@ -61,7 +61,7 @@
     <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && store().state.sessionID && collaboration_type === 'create'}">
       <h2>Your Session has been successfully created!</h2>
       <p>Your Session ID is: <b>{{store().state.sessionID}}</b></p>
-      <p>Use this link to invite collaborators: <i>{{"http://test.com/?session=" + store().state.sessionID}}</i></p>
+      <p>Use this link to invite collaborators: <i><a :href="'http://localhost:8080/?session=' + store().state.sessionID">{{"http://localhost:8080/?session=" + store().state.sessionID}}</a></i></p>
       <div class="buttonWrapper">
         <button @click="emitEvent('cancel', true)" class="finish">start patching</button>
       </div>
@@ -80,7 +80,7 @@
 import store from "@/store";
 export default {
   name: 'ModuleBar',
-  props: ['visible', 'type'],
+  props: ['visible', 'type', 'session'],
   inject: ["eventBus"],
   data() {
     return {
@@ -90,6 +90,12 @@ export default {
       retypePassword: null,
       collaboration_type: null,
       existingSessionID: null
+    }
+  },
+  mounted(){
+    if(this.session){
+      this.existingSessionID = this.session
+      this.collaboration_type = "join"
     }
   },
   methods: {

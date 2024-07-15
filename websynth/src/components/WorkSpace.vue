@@ -2,7 +2,7 @@
   <div class="workspace" @drop="onDrop">
     <button @click="updateCursorPosition('2')">Update</button>
     <ModuleBar></ModuleBar>
-    <SaveModal :visible="saveModalVisible" :type="modalType"></SaveModal>
+    <SaveModal :visible="saveModalVisible" :type="modalType" :session="querySession"></SaveModal>
     <div class="disable_workspace" :class="{active: store.state.modalOpened}"></div>
     <VueFlow :nodes="elements" :node-types="nodeTypes" :snap-to-grid="true" :snap-grid="[20,20]" :connect-on-click="true" @nodesChange="getModules($event, 'nodes')" @edgesChange="getModules($event, 'edges')" @pane-ready="setInstance" @dragover="onDragOver" @dragleave="onDragLeave">
       <Background />
@@ -54,6 +54,7 @@ import EnvelopeModule from "@/components/synth_modules/EnvelopeModule.vue";
 import VCAModule from "@/components/synth_modules/VCAModule.vue";
 import CursorModule from "@/components/synth_modules/CursorModule.vue";
 const store = useStore()
+import { useRouter } from 'vue-router'
 
 const { toObject, fromObject, onConnect, addEdges, updateNode, applyNodeChanges, applyEdgeChanges } = useVueFlow()
 onConnect(addEdges)
@@ -61,12 +62,14 @@ const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
 
-let {startConnection, createSession, joinSession, sendFullArray, sendChange} = useWebsocket()
+let {startConnection, createSession, joinSession, sendChange} = useWebsocket()
+let router = useRouter()
 
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements'])
 const saveModalVisible = ref(false)
 const modalType = ref("")
+const querySession = ref(router.currentRoute.value.query.session)
 
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
@@ -150,6 +153,12 @@ onMounted(() => {
   })
 
   getModules()
+
+  if(router.currentRoute.value.query.session){
+    saveModalVisible.value = true
+    modalType.value = "start_collaboration"
+    store.commit('changeModalOpened', true)
+  }
 })
 
 eventBus.on("navBar-click", (param) => {
@@ -252,8 +261,6 @@ const getModules = (changes, type) => {
     emit('updateElements', elements)
     set("flow", JSON.stringify(toObject()))
     if(store.state.websocketConnected){
-      sendFullArray(toObject())
-
       if(changes && Array.isArray(changes))
       changes.forEach(change => {
         sendChange(change, type)

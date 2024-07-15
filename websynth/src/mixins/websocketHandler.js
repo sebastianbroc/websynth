@@ -26,13 +26,6 @@ export default function useWebsocket() {
         socket.send(JSON.stringify({msg: "join session", id: id, password: pass}))
     }
 
-    function sendFullArray(elements){
-        if(socket){
-            console.log(elements)
-            //socket.send(JSON.stringify({msg: "update elements", elements: JSON.stringify(elements)}))
-        }
-    }
-
     function sendChange(change, type){
         if(socket){
             socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change), type: type}))
@@ -76,7 +69,6 @@ export default function useWebsocket() {
         startConnection,
         createSession,
         joinSession,
-        sendFullArray,
         sendChange
     }
 }
