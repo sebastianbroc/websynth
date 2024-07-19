@@ -9,16 +9,36 @@
     </div>
     <div class="controls">
       <div class="control_row">
-        <span>A</span><div><input type="number" min="0" v-model="node.data.attack" v-on:input="emitChange"><span>ms</span></div>
+        <span>A</span>
+        <div class="control_row">
+          <input type="number" min="0" v-model="node.data.attack" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+          <ControlKnob v-model="node.data.attack" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
+          <span>ms</span>
+        </div>
       </div>
       <div class="control_row">
-        <span>D</span><div><input type="number" min="0" v-model="node.data.decay" v-on:input="emitChange"><span>ms</span></div>
+        <span>D</span>
+        <div class="control_row">
+          <input type="number" min="0" v-model="node.data.decay" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+          <ControlKnob v-model="node.data.decay" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
+          <span>ms</span>
+        </div>
       </div>
       <div class="control_row">
-        <span>S</span><div><input type="number" min="0" v-model="node.data.sustain" v-on:input="emitChange"><span>ms</span></div>
+        <span>S</span>
+        <div class="control_row">
+          <input type="number" min="0" v-model="node.data.sustain" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+          <ControlKnob v-model="node.data.sustain" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
+          <span>ms</span>
+        </div>
       </div>
       <div class="control_row">
-        <span>R</span><div><input type="number" min="0" v-model="node.data.release" v-on:input="emitChange"><span>ms</span></div>
+        <span>R</span>
+        <div class="control_row">
+          <input type="number" min="0" v-model="node.data.release" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+          <ControlKnob v-model="node.data.release" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
+          <span>ms</span>
+        </div>
       </div>
       <div class="control_row">
         <button @click="manualTrigger">trigger</button>
@@ -32,8 +52,10 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted } from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
+import store from "@/store";
+import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange'])
 const {node} = useNode()
 
@@ -41,16 +63,32 @@ const {node} = useNode()
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
+const knobOptions = {
+  bgClass: "knobBG",
+  svgClass: "knobSVG",
+  rimClass: "knobRim",
+  valueArchClass: "knobValueArch",
+  tickClass: "knobTick",
+  valueTextClass: "knobText",
+  minValue: 0,
+  maxValue: 1000,
+  hideDefaultValue: false,
+  wheelFactor: 2
+}
 
 onMounted(() => {
-  node.data = {
+  node.data = reactive({
     ...node.data,
     attack: node.data.attack ?? 10,
     decay: node.data.decay ?? 10,
     sustain: node.data.sustain ?? 10,
     release: node.data.release ?? 10,
     triggered: node.data.triggered ?? false
-  }
+  })
+
+  watch(node.data, () => {
+    emitChange();
+  })
 })
 
 let manualTrigger = () => {

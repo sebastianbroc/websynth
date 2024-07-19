@@ -60,8 +60,12 @@ export default {
 
       this.elements.forEach(module => {
         this.handleNodeList(module)
+      })
+
+      this.elements.forEach(module => {
         this.buildConnection(module)
       })
+
       this.handleOrphans()
     },
     getModuleChild(id){

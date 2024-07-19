@@ -12,8 +12,8 @@
       <div class="control_row">
         <ControlKnob v-model="node.data.frequency" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
         <input type="text" v-model="node.data.frequency" v-on:input="emitChange" v-if="store.state.inputType === 'text'"><span v-if="store.state.inputType === 'text'">Hz</span>
+        <Handle type="target" class="custom_handle port_input" id="prop frequency"></Handle>
         <span style="margin: 0;">frequency</span>
-        <Handle type="target" class="custom_handle port_input"></Handle>
       </div>
       <select v-model="node.data.waveform" v-on:change="emitChange">
         <option value="sine">Sine</option>

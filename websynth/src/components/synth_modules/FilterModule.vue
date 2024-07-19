@@ -8,8 +8,9 @@
       <img class="icon" src="@/assets/icons/icon_filter.png">
     </div>
     <div class="controls">
-      <div>
-        <input type="text" v-model="node.data.frequency" v-on:input="emitChange"><span>Hz</span>
+      <div class="control_row">
+        <ControlKnob v-model="node.data.frequency" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob><span>cutoff</span>
+        <input type="text" v-model="node.data.frequency" v-on:input="emitChange" v-if="store.state.inputType === 'text'"><span v-if="store.state.inputType === 'text'">Hz</span>
       </div>
       <select v-model="node.data.type" v-on:change="emitChange">
         <option value="lowpass" selected>Low-Pass</option>
@@ -31,21 +32,40 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted} from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
+import store from "@/store";
+import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange'])
 const {node} = useNode()
+
+const knobOptions = {
+  bgClass: "knobBG",
+  svgClass: "knobSVG",
+  rimClass: "knobRim",
+  valueArchClass: "knobValueArch",
+  tickClass: "knobTick",
+  valueTextClass: "knobText",
+  minValue: 0,
+  maxValue: 20000,
+  hideDefaultValue: false,
+  wheelFactor: 2
+}
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
 
 onMounted(() => {
-  node.data = {
+  node.data = reactive({
     ...node.data,
     frequency: node.data.frequency ?? 400,
     type: node.data.type ?? "lowpass"
-  }
+  })
+
+  watch(node.data, () => {
+    emitChange();
+  })
 })
 
 let emitChange = () => {
