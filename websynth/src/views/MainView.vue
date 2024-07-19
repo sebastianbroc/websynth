@@ -61,7 +61,6 @@ export default {
       this.elements.forEach(module => {
         this.handleNodeList(module)
       })
-
       this.elements.forEach(module => {
         this.buildConnection(module)
       })
@@ -78,37 +77,54 @@ export default {
         let audioNode = this.audioNodeList.find(n => n.id === source.id)
         let targetAudioNode = this.audioNodeList.find(n => n.id === target.target)
 
-        if (target && !audioNode.connected){
-          switch(target.targetNode.type){
-            case 'output':
-              if(Array.isArray(audioNode.module)) {
-                audioNode.module[0].connect(this.mainVolume)
-              } else {
-                audioNode.module.connect(this.mainVolume)
-              }
-              break;
-            case 'mixer':
-              audioNode.module.connect(targetAudioNode.module[parseInt(target.targetHandle)])
-              break;
-            default:
-              if(target.targetHandle && targetAudioNode){
-                if(target.targetHandle === "main"){
-                  audioNode.module.connect(targetAudioNode.module)
-                } else if(Array.isArray(audioNode.module)) {
-                  audioNode.module[0].connect(targetAudioNode.module)
-                } else {
-                  audioNode.module.connect(targetAudioNode.module[target.targetHandle])
-                }
-              }
-              break;
-          }
+        try{
+          let sourceModule = audioNode.module.module ?? audioNode.module
 
-          audioNode.connected = true
-          try{ //in case it is an oscillator, we have to start it *after* connecting to the main Volume
-            audioNode.module.start()
-          } catch(e){
-            //do nothing
+          if (target && !audioNode.connected){
+            switch(target.targetNode.type){
+              case 'output':
+                if(Array.isArray(audioNode.module)) {
+                  audioNode.module[0].connect(this.mainVolume)
+                } else {
+                  sourceModule.connect(this.mainVolume)
+                }
+                break;
+              case 'mixer':
+                sourceModule.connect(targetAudioNode.module[parseInt(target.targetHandle)])
+                break;
+              default:
+                if(target.targetHandle && targetAudioNode){
+                  if(target.targetHandle === "main"){
+                    sourceModule.connect(targetAudioNode.module)
+                  } else if(Array.isArray(audioNode.module)) {
+                    audioNode.module[0].connect(targetAudioNode.module)
+                  } else {
+
+                    if(target.targetHandle.includes("prop")){
+                      sourceModule.connect(targetAudioNode.module[target.targetHandle.substring(5)])
+                      try{
+                        sourceModule.start();
+                      } catch {
+                        //do nothing
+                      }
+                    } else {
+                      sourceModule.connect(targetAudioNode.module[target.targetHandle])
+                    }
+                  }
+                }
+                break;
+            }
+
+            audioNode.connected = true
+            try{ //in case it is an oscillator, we have to start it *after* connecting to the main Volume
+              audioNode.module.start()
+            } catch(e){
+              //do nothing
+            }
           }
+        } catch(e) {
+          console.error(e)
+          //do nothing
         }
       } else {
         this.handleDisconnection(source)
@@ -122,6 +138,19 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
+          case 'sequencer':
+                if(isNewNode){
+                  Node = {steps: [0], currentStep: 0, module: new ConstantSourceNode(this.audioContext, {
+                      offset: 0
+                    })}
+                } else {
+                  Node.steps = module.data.steps
+                  Node.currentStep = module.data.currentStep
+                  Node.module.offset.value = module.data.steps[module.data.currentStep]
+                }
+
+              if(isNewNode) createdNewNode = true
+            break;
           case 'envelope':
             if(isNewNode){
               Node = new EnvelopeGenerator(this.audioContext, (module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
@@ -138,7 +167,7 @@ export default {
           case 'vca':
             if(isNewNode){
               Node = this.audioContext.createGain()
-              Node.gain.setValueAtTime(1, this.audioContext.currentTime)
+              Node.gain.setValueAtTime(0, this.audioContext.currentTime)
               createdNewNode = true
             }
             break;
@@ -204,10 +233,14 @@ export default {
       this.audioNodeList.forEach((audioNode, index) => {
         let match = this.elements.find(e => e.id === audioNode.id)
         if(!match){
-          if(Array.isArray(audioNode.module)) {
-            audioNode.module[0].disconnect()
-          } else {
-            audioNode.module.disconnect()
+          try{
+            if(Array.isArray(audioNode.module)) {
+              audioNode.module[0].disconnect()
+            } else {
+              audioNode.module.disconnect()
+            }
+          } catch {
+            //do nothing
           }
 
           this.audioNodeList.splice(index, 1)

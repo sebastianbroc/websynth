@@ -28,6 +28,9 @@
       <template #node-cursor="customNodeProps">
         <CursorModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
+      <template #node-sequencer="customNodeProps">
+        <SequencerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
+      </template>
     </VueFlow>
   </div>
 </template>
@@ -53,6 +56,7 @@ import MixerModule from "@/components/synth_modules/MixerModule.vue";
 import EnvelopeModule from "@/components/synth_modules/EnvelopeModule.vue";
 import VCAModule from "@/components/synth_modules/VCAModule.vue";
 import CursorModule from "@/components/synth_modules/CursorModule.vue";
+import SequencerModule from "@/components/synth_modules/SequencerModule.vue";
 const store = useStore()
 import { useRouter } from 'vue-router'
 
@@ -79,6 +83,7 @@ const nodeTypes = {
   envelope: markRaw(EnvelopeModule),
   vca: markRaw(VCAModule),
   cursor: markRaw(CursorModule),
+  sequencer: markRaw(SequencerModule),
 }
 
 let elements = ref([

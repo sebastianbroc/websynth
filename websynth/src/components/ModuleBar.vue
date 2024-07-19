@@ -10,6 +10,7 @@
           <div class="node vue-flow__node-mixer" :draggable="true" @dragstart="onDragStart($event, 'mixer')">Mixer <img class="icon" src="@/assets/icons/icon_mixer.png"></div>
           <div class="node vue-flow__node-envelope" :draggable="true" @dragstart="onDragStart($event, 'envelope')">Envelope <img class="icon" src="@/assets/icons/icon_envelope.png"></div>
           <div class="node vue-flow__node-vca" :draggable="true" @dragstart="onDragStart($event, 'vca')">VCA <img class="icon" src="@/assets/icons/icon_vca.png"></div>
+          <div class="node vue-flow__node-sequencer" :draggable="true" @dragstart="onDragStart($event, 'sequencer')">Sequencer <img class="icon" src="@/assets/icons/icon_sequencer.png"></div>
         </div>
       </aside>
     </div>
