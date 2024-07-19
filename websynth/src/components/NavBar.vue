@@ -3,12 +3,6 @@
     <div class="navbar-content one-third">
       <a><b>websynth</b> //</a>
       <div class="category">
-        <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">home</a>
-        <div class="options">
-          <span>there is nothing here yet</span>
-        </div>
-      </div>
-      <div class="category">
         <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">patch</a>
         <div class="options">
           <button @click="emitEvent('save patch to file')">save patch to file</button>
@@ -18,7 +12,7 @@
       <div class="category">
         <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">view</a>
         <div class="options">
-          <span>there is nothing here yet</span>
+          <button @click="emitEvent('toggle input display')"><span v-if="store().state.inputType === 'text'">✓ </span>display inputs as text</button>
         </div>
       </div>
       <div class="category">

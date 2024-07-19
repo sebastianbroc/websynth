@@ -1,6 +1,6 @@
 <template>
   <div class="workspace" @drop="onDrop">
-    <button @click="updateCursorPosition('2')">Update</button>
+    <button @click="updateCursorPosition('2')" style="display: none;">Update</button>
     <ModuleBar></ModuleBar>
     <SaveModal :visible="saveModalVisible" :type="modalType" :session="querySession"></SaveModal>
     <div class="disable_workspace" :class="{active: store.state.modalOpened}"></div>
@@ -162,22 +162,30 @@ onMounted(() => {
 })
 
 eventBus.on("navBar-click", (param) => {
-  if(param === "reset workspace"){
-    console.log("resetting workspace...")
-    fromObject(initial_elements)
-    getModules()
-  } else if (param === 'save patch to file'){
-    saveModalVisible.value = true
-    modalType.value = "save"
-    store.commit('changeModalOpened', true)
-  } else if (param === 'load patch from file'){
-    saveModalVisible.value = true
-    modalType.value = "load"
-    store.commit('changeModalOpened', true)
-  } else if (param === 'start collaboration'){
-    saveModalVisible.value = true
-    store.commit('changeModalOpened', true)
-    modalType.value = "start_collaboration"
+  switch(param){
+    case "reset workspace":
+      console.log("resetting workspace...")
+      fromObject(initial_elements)
+      getModules()
+      break;
+    case "save patch to file":
+      saveModalVisible.value = true
+      modalType.value = "save"
+      store.commit('changeModalOpened', true)
+      break;
+    case "load patch from file":
+      saveModalVisible.value = true
+      modalType.value = "load"
+      store.commit('changeModalOpened', true)
+      break;
+    case "start collaboration":
+      saveModalVisible.value = true
+      store.commit('changeModalOpened', true)
+      modalType.value = "start_collaboration"
+      break;
+    case "toggle input display":
+      store.commit("toggleInputType")
+      break;
   }
 })
 

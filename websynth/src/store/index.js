@@ -6,7 +6,8 @@ export default createStore({
     modalOpened: false,
     websocketConnected: false,
     sessionID: null,
-    error: null
+    error: null,
+    inputType: "knob"
   },
   getters: {
   },
@@ -25,6 +26,9 @@ export default createStore({
     },
     changeError(state, p) {
       state.error = p
+    },
+    toggleInputType(state){
+      state.inputType = state.inputType === "knob" ? "text" : "knob"
     }
   },
   actions: {

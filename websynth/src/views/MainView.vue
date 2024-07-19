@@ -68,20 +68,6 @@ export default {
       //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
       return this.elements.find(m => m.type == "default" && m.sourceNode.id === id)
     },
-    handleOrphans(){
-      this.audioNodeList.forEach((audioNode, index) => {
-          let match = this.elements.find(e => e.id === audioNode.id)
-          if(!match){
-            if(Array.isArray(audioNode.module)) {
-              audioNode.module[0].disconnect()
-            } else {
-              audioNode.module.disconnect()
-            }
-
-            this.audioNodeList.splice(index, 1)
-          }
-      })
-    },
     buildConnection(source){
       let target = this.getModuleChild(source.id)
       if(target){
@@ -102,8 +88,6 @@ export default {
               break;
             default:
               if(target.targetHandle && targetAudioNode){
-                console.log("connecting to custom target")
-                console.log(target.targetHandle)
                 if(target.targetHandle === "main"){
                   audioNode.module.connect(targetAudioNode.module)
                 } else if(Array.isArray(audioNode.module)) {
@@ -137,7 +121,6 @@ export default {
           case 'envelope':
             if(isNewNode){
               Node = new EnvelopeGenerator(this.audioContext, (module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
-              console.log(Node)
               createdNewNode = true
             } else {
               Node.updateData((module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
@@ -212,7 +195,21 @@ export default {
       } catch(e){
         //do nothing
       }
-    }
+    },
+    handleOrphans(){
+      this.audioNodeList.forEach((audioNode, index) => {
+        let match = this.elements.find(e => e.id === audioNode.id)
+        if(!match){
+          if(Array.isArray(audioNode.module)) {
+            audioNode.module[0].disconnect()
+          } else {
+            audioNode.module.disconnect()
+          }
+
+          this.audioNodeList.splice(index, 1)
+        }
+      })
+    },
   }
 }
 </script>

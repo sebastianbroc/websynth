@@ -15,15 +15,6 @@
   --warning-two: #ff0000;
 
   --lighten: rgba(255,255,255,0.8);
-
-
-  --p-knob-range-background: var(--c-secondary);
-  --p-knob-value-background: white;
-  --p-knob-text-color: white;
-  --p-knob-focus-ring-color: white;
-  --p-knob-focus-ring-offset: 200px;
-  --p-knob-focus-ring-width: 0;
-  --p-knob-focus-ring-shadow: none;
 }
 
 #app {
@@ -84,6 +75,12 @@ body {
     gap: 10px;
     align-items: center;
   }
+
+  input, select {
+    background: var(--c-tertiary);
+    border: none;
+    border-radius: 5px;
+  }
 }
 
 .module_label {
@@ -107,4 +104,24 @@ body {
 .vue-flow__node-cursor {
   transition: transform 0.4s;
 }
+
+/*** Knob Control Styles ***/
+.knobBG {
+  color: var(--c-primary);
+}
+
+.knobText {
+  color: black;
+  font-size: 1.4rem;
+}
+
+.knobRim {
+  color: var(--c-primary);
+}
+
+.knobValueArch {
+  color: var(--c-secondary);
+}
+
+
 </style>
