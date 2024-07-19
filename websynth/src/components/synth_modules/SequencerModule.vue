@@ -52,8 +52,8 @@ const knobOptions = {
 onBeforeMount(() => {
   node.data = {
     ...node.data,
-    steps : [0],
-    currentStep: 0
+    steps : node.data.steps ?? [0],
+    currentStep: node.data.currentStep ?? 0
   }
 })
 
@@ -66,8 +66,14 @@ onMounted(() => {
 
   watch(node.data, () => {
     emitChange();
+    if(node.data.currentStep > 15) node.data.currentStep = 0
   })
 })
+
+//eslint-disable-next-line
+let next = () => {
+  node.data.currentStep++
+}
 
 let buildStepsArray = (length) => {
   let array = []

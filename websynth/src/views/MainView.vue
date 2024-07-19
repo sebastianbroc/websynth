@@ -138,6 +138,9 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
+          case 'clock':
+            Node = {interval: module.data.interval}
+            break;
           case 'sequencer':
                 if(isNewNode){
                   Node = {steps: [0], currentStep: 0, module: new ConstantSourceNode(this.audioContext, {

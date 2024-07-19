@@ -31,6 +31,9 @@
       <template #node-sequencer="customNodeProps">
         <SequencerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
+      <template #node-clock="customNodeProps">
+        <ClockModule v-bind="customNodeProps" @clockTrigger="clockTrigger($event[0].id)" />
+      </template>
     </VueFlow>
   </div>
 </template>
@@ -57,6 +60,7 @@ import EnvelopeModule from "@/components/synth_modules/EnvelopeModule.vue";
 import VCAModule from "@/components/synth_modules/VCAModule.vue";
 import CursorModule from "@/components/synth_modules/CursorModule.vue";
 import SequencerModule from "@/components/synth_modules/SequencerModule.vue";
+import ClockModule from "@/components/synth_modules/ClockModule.vue";
 const store = useStore()
 import { useRouter } from 'vue-router'
 
@@ -84,6 +88,7 @@ const nodeTypes = {
   vca: markRaw(VCAModule),
   cursor: markRaw(CursorModule),
   sequencer: markRaw(SequencerModule),
+  clock: markRaw(ClockModule),
 }
 
 let elements = ref([
@@ -282,6 +287,17 @@ const getModules = (changes, type) => {
   }
 }
 
+const clockTrigger = (id) => {
+  if(vueFlowInstance && getModuleChild(id) && getModuleChild(id).targetNode){
+    if(getModuleChild(id).targetNode.data.currentStep < 15){
+      getModuleChild(id).targetNode.data.currentStep++
+    } else {
+      getModuleChild(id).targetNode.data.currentStep = 0
+    }
+
+  }
+}
+
 const initDragAndDrop = () => {
   get("flow").then(value => {
     let flow = null
@@ -295,6 +311,12 @@ const initDragAndDrop = () => {
     max = Math.max(...max)
     initializeId(max === -Infinity ? 0 : max + 1)
   })
+}
+
+const getModuleChild = (id) => {
+  //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
+  let elements = vueFlowInstance.getElements._value
+  return elements.find(m => m.type == "default" && m.sourceNode.id === id)
 }
 
 const { onDragOver, onDrop, onDragLeave, initializeId } = useDragAndDrop()

@@ -11,6 +11,7 @@
           <div class="node vue-flow__node-envelope" :draggable="true" @dragstart="onDragStart($event, 'envelope')">Envelope <img class="icon" src="@/assets/icons/icon_envelope.png"></div>
           <div class="node vue-flow__node-vca" :draggable="true" @dragstart="onDragStart($event, 'vca')">VCA <img class="icon" src="@/assets/icons/icon_vca.png"></div>
           <div class="node vue-flow__node-sequencer" :draggable="true" @dragstart="onDragStart($event, 'sequencer')">Sequencer <img class="icon" src="@/assets/icons/icon_sequencer.png"></div>
+          <div class="node vue-flow__node-clock" :draggable="true" @dragstart="onDragStart($event, 'clock')">Clock <img class="icon" src="@/assets/icons/icon_clock.png"></div>
         </div>
       </aside>
     </div>
