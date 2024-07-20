@@ -34,7 +34,7 @@ import store from "@/store";
 import {defineEmits, defineProps, onMounted, reactive, watch} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 const {node} = useNode()
-const emit = defineEmits(['nodesChange'])
+const emit = defineEmits(['nodesChange','moduleChanged'])
 import ControlKnob from '@slipmatio/control-knob'
 
 const knobOptions = {

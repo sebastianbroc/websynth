@@ -54,7 +54,7 @@ import {defineProps, defineEmits, onMounted, reactive, watch, inject} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
-const emit = defineEmits(['nodesChange'])
+const emit = defineEmits(['nodesChange','moduleChanged'])
 const {node} = useNode()
 const eventBus = inject("eventBus")
 
