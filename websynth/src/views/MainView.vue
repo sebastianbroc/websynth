@@ -55,7 +55,7 @@ export default {
       })
     },
     updateElements(value){
-      console.log("updating elements")
+      //console.log("updating elements")
       this.elements = value
 
       this.elements.forEach(module => {
@@ -159,7 +159,6 @@ export default {
             }
 
             if(module.data.triggered){
-              console.log("trying to trigger...")
               Node.trigger()
             }
             break;

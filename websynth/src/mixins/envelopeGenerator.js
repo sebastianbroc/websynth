@@ -14,8 +14,6 @@ export default function EnvelopeGenerator(context, a, d, s, r) {
     }
 
     EnvelopeGenerator.prototype.trigger = function() {
-        console.log("triggering env now")
-        console.log(this.param)
         let now = this.context.currentTime;
         this.param.cancelScheduledValues(now);
         this.param.setValueAtTime(0, now);
@@ -23,7 +21,6 @@ export default function EnvelopeGenerator(context, a, d, s, r) {
         this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime);
         this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime + this.sustainTime);
         this.param.linearRampToValueAtTime(0, now + this.attackTime + this.decayTime + this.sustainTime + this.releaseTime);
-        console.log(this.param)
     };
 
     EnvelopeGenerator.prototype.connect = function(param) {
