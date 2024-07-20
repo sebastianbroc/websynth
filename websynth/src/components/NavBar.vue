@@ -9,6 +9,7 @@
           <button @click="emitEvent('load patch from file')">load patch from file</button>
           <span class="divider">Example Patches</span>
           <button @click="loadSamplepatch('strangerthings')">stranger things</button>
+          <button @click="loadSamplepatch('glockenspiel')">glockenspiel</button>
         </div>
       </div>
       <div class="category">

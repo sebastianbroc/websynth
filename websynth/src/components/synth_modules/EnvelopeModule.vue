@@ -40,24 +40,23 @@
           <span>ms</span>
         </div>
       </div>
-      <div class="control_row">
-        <button @click="manualTrigger">trigger</button>
-      </div>
       <div class="divider_row"></div>
-      <div class="control_row">
-        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span>
+      <div class="ports">
+        <div><Handle type="source" class="custom_handle port_input" id="clock_in" :position="Position.Left" /><span>trigger in</span></div>
+        <div><Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span></div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted, reactive, watch} from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch, inject} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange'])
 const {node} = useNode()
+const eventBus = inject("eventBus")
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
@@ -92,7 +91,6 @@ onMounted(() => {
 })
 
 let manualTrigger = () => {
-  console.log("manual trigger")
   node.data.triggered = true
   emitChange()
 }
@@ -101,6 +99,12 @@ let emitChange = () => {
   emit('moduleChanged', [{id: props.id, data: node.data}])
   node.data.triggered = false
 }
+
+eventBus.on("triggerModule", (id) => {
+  if(id === props.id){
+    manualTrigger();
+  }
+})
 </script>
 <style scoped>
 span {
@@ -115,6 +119,16 @@ span {
     display: flex;
     gap: 10px;
     align-items: center;
+  }
+
+  .ports {
+    display: flex;
+    flex-direction: column;
+
+    div {
+      display: flex;
+      align-items: center;
+    }
   }
 }
 
