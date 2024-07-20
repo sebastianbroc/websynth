@@ -78,9 +78,8 @@ export default {
         let targetAudioNode = this.audioNodeList.find(n => n.id === target.target)
 
         try{
-          let sourceModule = audioNode.module.module ?? audioNode.module
-
-          if (target && !audioNode.connected){
+          if (audioNode && target && !audioNode.connected){
+            let sourceModule = audioNode.module.module ?? audioNode.module
             switch(target.targetNode.type){
               case 'output':
                 if(Array.isArray(audioNode.module)) {
@@ -138,9 +137,6 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
-          case 'clock':
-            Node = {interval: module.data.interval}
-            break;
           case 'sequencer':
                 if(isNewNode){
                   Node = {steps: [0], currentStep: 0, module: new ConstantSourceNode(this.audioContext, {

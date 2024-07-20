@@ -25,11 +25,12 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted, onBeforeMount,  reactive, watch} from 'vue'
+import {defineProps, defineEmits, onMounted, onBeforeMount, reactive, watch, inject} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange'])
+const eventBus = inject("eventBus")
 const {node} = useNode()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
@@ -72,7 +73,11 @@ onMounted(() => {
 
 //eslint-disable-next-line
 let next = () => {
-  node.data.currentStep++
+  if(node.data.currentStep < 15){
+    node.data.currentStep++
+  } else {
+    node.data.currentStep = 0
+  }
 }
 
 let buildStepsArray = (length) => {
@@ -86,6 +91,12 @@ let buildStepsArray = (length) => {
 let emitChange = () => {
   emit('moduleChanged', [{id: props.id, data: node.data}])
 }
+
+eventBus.on("triggerModule", (id) => {
+  if(id === props.id){
+    next();
+  }
+})
 </script>
 <style scoped>
 span {

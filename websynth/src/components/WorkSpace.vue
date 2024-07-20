@@ -74,7 +74,7 @@ let {startConnection, createSession, joinSession, sendChange} = useWebsocket()
 let router = useRouter()
 
 // eslint-disable-next-line no-undef
-const emit = defineEmits(['updateElements'])
+const emit = defineEmits(['updateElements', 'triggerModule'])
 const saveModalVisible = ref(false)
 const modalType = ref("")
 const querySession = ref(router.currentRoute.value.query.session)
@@ -199,6 +199,16 @@ eventBus.on("navBar-click", (param) => {
   }
 })
 
+eventBus.on("loadSamplepatch", (patchname) => {
+  console.log("./sample_patches/" + patchname + ".json")
+  fetch("/sample_patches/" + patchname + ".json").then(res => {
+    res.text().then(data => {
+      fromObject(JSON.parse(data))
+      getModules()
+    })
+    })
+})
+
 
 eventBus.on("modal-click-cancel", () => {
   saveModalVisible.value = false
@@ -289,12 +299,7 @@ const getModules = (changes, type) => {
 
 const clockTrigger = (id) => {
   if(vueFlowInstance && getModuleChild(id) && getModuleChild(id).targetNode){
-    if(getModuleChild(id).targetNode.data.currentStep < 15){
-      getModuleChild(id).targetNode.data.currentStep++
-    } else {
-      getModuleChild(id).targetNode.data.currentStep = 0
-    }
-
+    eventBus.emit("triggerModule", getModuleChild(id).targetNode.id)
   }
 }
 

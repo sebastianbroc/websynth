@@ -7,6 +7,8 @@
         <div class="options">
           <button @click="emitEvent('save patch to file')">save patch to file</button>
           <button @click="emitEvent('load patch from file')">load patch from file</button>
+          <span class="divider">Example Patches</span>
+          <button @click="loadSamplepatch('strangerthings')">stranger things</button>
         </div>
       </div>
       <div class="category">
@@ -56,6 +58,9 @@ export default {
     emitEvent(param){
       this.eventBus.emit("navBar-click", param)
     },
+    loadSamplepatch(patchname){
+      this.eventBus.emit("loadSamplepatch", patchname)
+    },
     hideOtherMenus(e){
       let elements = document.querySelectorAll(".category a")
       elements.forEach(element => {
@@ -93,6 +98,14 @@ export default {
 
       span {
         font-size: 0.8rem;
+
+        &.divider {
+          font-weight: bold;
+          margin-top: 10px;
+          display: inline-block;
+          background: none;
+          width: 100%;
+        }
       }
 
       button {
