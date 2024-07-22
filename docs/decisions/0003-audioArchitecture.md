@@ -1,45 +1,63 @@
-# Wie werden die vorhandenen Audioquellen verwaltet und miteinander verbunden?
+# Welche Technologie wird genutzt, um Audio zu generieren?
 
-* Datum: 2024-05-26
+* Datum: 2024-05-13
 
 ## Kontext und Problematik
 
-Perspektivisch wird es eine große Anzahl an virtuellen Audioquellen und -Verarbeitungsmodulen geben. Diese müssen verwaltet und miteinander verbunden werden, um Signalketten herstellen zu können. Eine optimale Leistung und Wartbarkeit sollten dabei in Betracht gezogen werden.
+Für das System wird ein geeignetes Framework zur Tonerzeugung benötigt. Das Framework muss eine präzise und flexible Klangerzeugung ermöglichen und in der Lage sein, in Echtzeit auf Benutzerinteraktionen zu reagieren. Eine nahtlose Integration in die bestehende Web-Technologie und eine gute Performance sind ebenfalls wichtig.
+
 
 
 ## Optionen
 
-* Zentrale Verwaltung: Eine zentrale Liste führt alle Audioquellen und Module und verwaltet deren Verbindungen und Interaktionen von einer Vue-Komponente aus.
-* Dezentrale Verwaltung: Jedes Modul (Vue-Komponente) verwaltet seine eigenen Audioquellen und Verbindungen unabhängig.
+* Tone.Js
+* Pizzicato.js
+* Web Audio API (keine Library)
 
 ## Entscheidung
 
-Die Audioquellen werden zentral in einer Frontend-Komponente verwaltet. Voraussichtlich verspricht dieser Ansatz eine höhere Übersichtlichkeit über alle aktiven Audio-Komponenten und ein leichteres Verständnis über die aktive Konfiguration.
+Für die Klangerzeugung des Systems wird keine Library genutzt, sondern auf die zugrundeliegende Web Audio API zurückgegriffen.
 
 ## Vor- und Nachteile der Optionen
 
-### Zentrale Verwaltung
+### Tone.Js
 
 #### Vorteile:
-* Potenziell höhere Performance, da die Audioketten nicht über weitere Umwege hergestellt werden müssen.
-* Bessere Übersichtlichkeit und generell niedrigere Komplexität.
-* Einfacher zu skalieren und zu optimieren.
-* Vereinfachte Kommunikation zwischen Modulen.
-* Größere Flexibilität für zukünftige Erweiterungen.
+* Umfangreiche Funktionen für Synthesizer und Audioeffekte.
+* Einfache und intuitive API, die speziell für Web-Audio-Anwendungen entwickelt wurde.
+* Gute Dokumentation und aktive Community.
+* Abstraktion der Web Audio API, was die Entwicklung erleichtern kann.
 
 #### Nachteile:
-* Potenzieller Single Point of Failure.
-* Kann größer und komplexer werden, wenn die Anwendung wächst und eventuell sehr viele Module vorhanden sind.
+* Zusätzliche Abstraktionsschicht, die potenziell zu Performance-Einbußen führen kann.
+* Möglicherweise eingeschränkte Flexibilität bei sehr spezifischen Anforderungen, die nur mit der nativen Web Audio API realisierbar sind.
+* Abhängigkeit von einer externen Bibliothek, die gewartet und aktualisiert werden muss.
 
 
-### Dezentrale Verwaltung
+### Pizzicato.Js
 
 #### Vorteile:
-* Komponenten sind eigenständig - der Code ist jeweils abgegrenzt und leichter einzeln zu verstehen.
-* Fehlerquellen sind auf die Module verteilt.
+* Einfach zu verwenden und praktische Abstraktion der Web Audio API.
+* Unterstützt grundlegende Synthese und Effekte. 
+* Gut geeignet für einfache Audioanwendungen.
 
 #### Nachteile:
-* Schwieriger, den Zustand in der gesamten Anwendung zu verwalten.
-* Erhöhte Komplexität bei der Verwaltung der Kommunikation zwischen Modulen.
-* Potenzial für Inkonsistenzen und schwierigeres Debugging.
-* Skalierbarkeit und Leistungsoptimierungen sind schwieriger.
+* Weniger umfangreiche Funktionen und Flexibilität im Vergleich zu Tone.js und Web Audio API.
+* Kleinere Community und weniger Ressourcen verfügbar.
+* Möglicherweise nicht leistungsfähig genug für komplexe Syntheseanforderungen eines Modular-Synthesizers.
+
+
+### Web Audio API (keine Library)
+
+#### Vorteile:
+* Maximale Flexibilität und Kontrolle über die Audiowiedergabe und -verarbeitung.
+* Native Unterstützung in modernen Webbrowsern, ohne zusätzliche Abhängigkeiten.
+* Hohe Performance und niedrige Latenzzeiten, da keine zusätzliche Abstraktionsschicht verwendet wird.
+* Ermöglicht die Implementierung spezifischer und komplexer Audioverarbeitungstechniken.
+* "Built to be built upon" - und damit wie geschaffen für ein Projekt wie dieses, in welchem ein komplettes, neuartiges System geschaffen werden soll. 
+
+#### Nachteile:
+* Komplexe und umfangreiche API, die eine steilere Lernkurve erfordert.
+* Erfordert mehr Entwicklungsaufwand und tiefes Verständnis der Audioprogrammierung.
+* Weniger abstrahiert und daher weniger "out-of-the-box"-Funktionen im Vergleich zu Tone.js.
+
