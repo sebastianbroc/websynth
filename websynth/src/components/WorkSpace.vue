@@ -297,8 +297,10 @@ const getModules = (changes, type) => {
 }
 
 const clockTrigger = (id) => {
-  if(vueFlowInstance && getModuleChild(id) && getModuleChild(id).targetNode){
-    eventBus.emit("triggerModule", getModuleChild(id).targetNode.id)
+  if(vueFlowInstance && getModuleChildren(id).length > 0 && getModuleChildren(id)[0].targetNode){
+    getModuleChildren(id).forEach(child => {
+      eventBus.emit("triggerModule", child.targetNode.id)
+    })
   }
 }
 
@@ -317,10 +319,10 @@ const initDragAndDrop = () => {
   })
 }
 
-const getModuleChild = (id) => {
+const getModuleChildren = (id) => {
   //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
   let elements = vueFlowInstance.getElements._value
-  return elements.find(m => m.type == "default" && m.sourceNode.id === id)
+  return elements.filter(m => m.type == "default" && m.sourceNode.id === id)
 }
 
 const { onDragOver, onDrop, onDragLeave, initializeId } = useDragAndDrop()
