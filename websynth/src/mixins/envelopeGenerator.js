@@ -14,13 +14,15 @@ export default function EnvelopeGenerator(context, a, d, s, r) {
     }
 
     EnvelopeGenerator.prototype.trigger = function() {
-        let now = this.context.currentTime;
-        this.param.cancelScheduledValues(now);
-        this.param.setValueAtTime(0, now);
-        this.param.linearRampToValueAtTime(1, now + this.attackTime);
-        this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime);
-        this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime + this.sustainTime);
-        this.param.linearRampToValueAtTime(0, now + this.attackTime + this.decayTime + this.sustainTime + this.releaseTime);
+        if(this.param){
+            let now = this.context.currentTime;
+            this.param.cancelScheduledValues(now);
+            this.param.setValueAtTime(0, now);
+            this.param.linearRampToValueAtTime(1, now + this.attackTime);
+            this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime);
+            this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime + this.sustainTime);
+            this.param.linearRampToValueAtTime(0, now + this.attackTime + this.decayTime + this.sustainTime + this.releaseTime);
+        }
     };
 
     EnvelopeGenerator.prototype.connect = function(param) {

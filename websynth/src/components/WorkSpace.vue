@@ -14,7 +14,7 @@
         <FilterModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-output="customNodeProps">
-        <OutputModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
+        <OutputModule v-bind="customNodeProps" :deletable="false" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-mixer="customNodeProps">
         <MixerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
@@ -200,8 +200,7 @@ eventBus.on("navBar-click", (param) => {
 })
 
 eventBus.on("loadSamplepatch", (patchname) => {
-  console.log("./sample_patches/" + patchname + ".json")
-  fetch("/sample_patches/" + patchname + ".json").then(res => {
+  fetch("./sample_patches/" + patchname + ".json").then(res => {
     res.text().then(data => {
       fromObject(JSON.parse(data))
       getModules()

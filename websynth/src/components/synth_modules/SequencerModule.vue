@@ -45,7 +45,7 @@ const knobOptions = {
   tickClass: "knobTick",
   valueTextClass: "knobText",
   minValue: 0,
-  maxValue: 20000,
+  maxValue: 5000,
   hideDefaultValue: false,
   wheelFactor: 2
 }

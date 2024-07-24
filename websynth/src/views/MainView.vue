@@ -58,10 +58,10 @@ export default {
       //console.log("updating elements")
       this.elements = value
 
-      this.elements.forEach(module => {
+      this.elements.filter(e => e.type !== "default" && e.type !== "output").forEach(module => {
         this.handleNodeList(module)
       })
-      this.elements.forEach(module => {
+      this.elements.filter(e => e.type !== "default" && e.type !== "output").forEach(module => {
         this.buildConnection(module)
       })
 
@@ -73,13 +73,16 @@ export default {
     },
     buildConnection(source){
       let target = this.getModuleChild(source.id)
+
       if(target){
         let audioNode = this.audioNodeList.find(n => n.id === source.id)
         let targetAudioNode = this.audioNodeList.find(n => n.id === target.target)
 
         try{
           if (audioNode && target && !audioNode.connected){
-            let sourceModule = audioNode.module.module ?? audioNode.module
+
+            let sourceModule = Array.isArray(audioNode.module) ? audioNode.module[0] : audioNode.module.module ?? audioNode.module
+
             switch(target.targetNode.type){
               case 'output':
                 if(Array.isArray(audioNode.module)) {
@@ -95,11 +98,9 @@ export default {
                 if(target.targetHandle && targetAudioNode){
                   if(target.targetHandle === "main"){
                     sourceModule.connect(targetAudioNode.module)
-                  } else if(Array.isArray(audioNode.module)) {
-                    audioNode.module[0].connect(targetAudioNode.module)
                   } else {
-
                     if(target.targetHandle.includes("prop")){
+                      console.log("connecting to " + target.targetHandle.substring(5))
                       sourceModule.connect(targetAudioNode.module[target.targetHandle.substring(5)])
                       try{
                         sourceModule.start();
@@ -170,7 +171,7 @@ export default {
             }
             break;
           case 'mixer':
-            if(module.data){
+            if(module.data && module.data.channels){
               if(isNewNode){
                 //the gain node at position 0 is our main out of the mixer
                 let gainNodes = [this.audioContext.createGain()]
@@ -217,11 +218,16 @@ export default {
     handleDisconnection(source){
       try {
         let audioNode = this.audioNodeList.find(n => n.id === source.id)
-        audioNode.connected = false
-        if(Array.isArray(audioNode.module)){
-          audioNode.module[0].disconnect()
-        } else {
-          audioNode.module.disconnect()
+
+        if(audioNode){
+          audioNode.connected = false
+          if(Array.isArray(audioNode.module)){
+            audioNode.module[0].disconnect()
+          } else if (audioNode.module.module) {
+            audioNode.module.module.disconnect()
+          } else {
+            audioNode.module.disconnect()
+          }
         }
       } catch(e){
         //do nothing

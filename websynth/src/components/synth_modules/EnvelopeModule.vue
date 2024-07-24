@@ -90,7 +90,7 @@ onMounted(() => {
   })
 })
 
-let manualTrigger = () => {
+let trigger = () => {
   node.data.triggered = true
   emitChange()
 }
@@ -102,7 +102,7 @@ let emitChange = () => {
 
 eventBus.on("triggerModule", (id) => {
   if(id === props.id){
-    manualTrigger();
+    trigger();
   }
 })
 </script>
