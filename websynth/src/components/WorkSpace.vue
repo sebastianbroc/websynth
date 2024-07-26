@@ -34,6 +34,9 @@
       <template #node-clock="customNodeProps">
         <ClockModule v-bind="customNodeProps" @clockTrigger="clockTrigger($event[0].id)" />
       </template>
+      <template #node-midi="customNodeProps">
+        <MidiModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
+      </template>
     </VueFlow>
   </div>
 </template>
@@ -61,6 +64,7 @@ import VCAModule from "@/components/synth_modules/VCAModule.vue";
 import CursorModule from "@/components/synth_modules/CursorModule.vue";
 import SequencerModule from "@/components/synth_modules/SequencerModule.vue";
 import ClockModule from "@/components/synth_modules/ClockModule.vue";
+import MidiModule from "@/components/synth_modules/MidiModule.vue";
 const store = useStore()
 import { useRouter } from 'vue-router'
 
@@ -89,6 +93,7 @@ const nodeTypes = {
   cursor: markRaw(CursorModule),
   sequencer: markRaw(SequencerModule),
   clock: markRaw(ClockModule),
+  midi: markRaw(MidiModule)
 }
 
 let elements = ref([

@@ -140,6 +140,16 @@ export default {
         if(Node) Node = Node.module
 
         switch(module.type){
+          case 'midi':
+            if(isNewNode){
+              Node = {module: new ConstantSourceNode(this.audioContext, {
+                  offset: 0
+                })}
+            } else {
+              Node.module.offset.value = module.data.frequency
+            }
+            if(isNewNode) createdNewNode = true
+            break;
           case 'sequencer':
                 if(isNewNode){
                   Node = {steps: [0], currentStep: 0, module: new ConstantSourceNode(this.audioContext, {
