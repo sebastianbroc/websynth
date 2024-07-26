@@ -37,6 +37,9 @@
       <template #node-midi="customNodeProps">
         <MidiModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
+      <template #node-comment="customNodeProps">
+        <CommentModule v-bind="customNodeProps" />
+      </template>
     </VueFlow>
   </div>
 </template>
@@ -65,6 +68,7 @@ import CursorModule from "@/components/synth_modules/CursorModule.vue";
 import SequencerModule from "@/components/synth_modules/SequencerModule.vue";
 import ClockModule from "@/components/synth_modules/ClockModule.vue";
 import MidiModule from "@/components/synth_modules/MidiModule.vue";
+import CommentModule from "@/components/synth_modules/CommentModule.vue";
 const store = useStore()
 import { useRouter } from 'vue-router'
 
@@ -93,7 +97,8 @@ const nodeTypes = {
   cursor: markRaw(CursorModule),
   sequencer: markRaw(SequencerModule),
   clock: markRaw(ClockModule),
-  midi: markRaw(MidiModule)
+  midi: markRaw(MidiModule),
+  comment: markRaw(CommentModule)
 }
 
 let elements = ref([

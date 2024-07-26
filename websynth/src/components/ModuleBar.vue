@@ -13,6 +13,7 @@
           <div class="node vue-flow__node-sequencer" :draggable="true" @dragstart="onDragStart($event, 'sequencer')">Sequencer <img class="icon" src="@/assets/icons/icon_sequencer.png"></div>
           <div class="node vue-flow__node-clock" :draggable="true" @dragstart="onDragStart($event, 'clock')">Clock <img class="icon" src="@/assets/icons/icon_clock.png"></div>
           <div class="node vue-flow__node-midi" :draggable="true" @dragstart="onDragStart($event, 'midi')">Midi <img class="icon" src="@/assets/icons/icon_midi.png"></div>
+          <div class="node vue-flow__node-comment" :draggable="true" @dragstart="onDragStart($event, 'comment')">Comment <img class="icon" src="@/assets/icons/icon_comment.png"></div>
         </div>
       </aside>
     </div>
@@ -92,6 +93,7 @@ aside .nodes {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  overflow-y: scroll;
 }
 
 aside .nodes .node {
