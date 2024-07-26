@@ -111,19 +111,6 @@ const initial_elements = {
       },
       "data": {},
       "label": "Output"
-    },
-    {
-      "id": "2",
-      "type": "cursor",
-      "position": {
-        "x": 200,
-        "y": 200
-      },
-      "data": {
-        "color": "#ff0000",
-        "username": "Max Muster"
-      },
-      "label": "Cursor"
     }
   ],
   "edges": [],
@@ -203,8 +190,7 @@ eventBus.on("loadSamplepatch", (patchname) => {
   fetch("./sample_patches/" + patchname + ".json").then(res => {
     res.text().then(data => {
       fromObject(JSON.parse(data))
-      getModules()
-    })
+      getModules()})
     })
 })
 

@@ -101,7 +101,7 @@ export default {
                   } else {
                     if(target.targetHandle.includes("prop")){
                       console.log("connecting to " + target.targetHandle.substring(5))
-                      sourceModule.connect(targetAudioNode.module[target.targetHandle.substring(5)])
+                      sourceModule.connect(targetAudioNode.cvControls[target.targetHandle.substring(5)])
                       try{
                         sourceModule.start();
                       } catch {
@@ -135,6 +135,8 @@ export default {
         let Node = this.audioNodeList.find(n => n.id === module.id);
         let isNewNode = !Node
         let createdNewNode = false
+        let cvControls = {}
+        if(Node) cvControls = Node.cvControls ?? {}
         if(Node) Node = Node.module
 
         switch(module.type){
@@ -195,25 +197,43 @@ export default {
             break;
           case 'filter':
             if(module.data && module.data.frequency){
-              if(isNewNode) Node = this.audioContext.createBiquadFilter()
+              if(isNewNode) {
+                Node = this.audioContext.createBiquadFilter()
+                cvControls = this.buildCVControls(Node, ["frequency"])
+              }
               Node.frequency.setValueAtTime(module.data.frequency, this.audioContext.currentTime + 0.01)
               Node.type = module.data.type
+              cvControls.frequency.gain.setValueAtTime(module.data.cv_in_level, this.audioContext.currentTime + 0.01)
               createdNewNode = true
             }
             break;
           case 'oscillator':
             if(isNewNode){
               Node = this.audioContext.createOscillator()
+              cvControls = this.buildCVControls(Node, ["frequency", "detune"])
+              //cvControls = {"frequency": this.audioContext.createGain()}
+              //cvControls.frequency.connect(Node.frequency)
             }
             if(module.data.frequency && Node.frequency){
               Node.frequency.value = module.data.frequency
               Node.type = module.data.waveform
+              cvControls.frequency.gain.setValueAtTime(module.data.cv_in_level, this.audioContext.currentTime)
               createdNewNode = true
             }
             break;
         }
-        if(isNewNode && createdNewNode) this.audioNodeList.push({"id": module.id, module: Node, connected: false})
+        if(isNewNode && createdNewNode) this.audioNodeList.push({"id": module.id, module: Node, connected: false, cvControls: cvControls})
       }
+    },
+    buildCVControls(node, controls){
+      //build an array of gain nodes which are connected to the audio module's properties to control intensity of cv signals
+      let out = {}
+      controls.forEach(ctrl => {
+        out[ctrl] = this.audioContext.createGain()
+        out[ctrl].gain.setValueAtTime(1, this.audioContext.currentTime)
+        out[ctrl].connect(node[ctrl])
+      })
+      return out
     },
     handleDisconnection(source){
       try {

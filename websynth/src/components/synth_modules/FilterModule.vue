@@ -22,6 +22,11 @@
       </select>
       <div class="divider_row"></div>
       <div class="control_row">
+        <Handle id="prop frequency" type="target" class="custom_handle port_input" :position="Position.Top" /><span>cutoff in</span>
+        <ControlKnob v-model="node.data.cv_in_level" :options="knobOptionsCV" v-if="store.state.inputType === 'knob'"></ControlKnob>
+        <input type="text" v-model="node.data.cv_in_level" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+      </div>
+      <div class="control_row">
         <Handle id="main" type="target" class="custom_handle port_input" :position="Position.Top" /><span>signal in</span>
       </div>
       <div class="control_row">
@@ -52,6 +57,8 @@ const knobOptions = {
   wheelFactor: 2
 }
 
+const knobOptionsCV = {...knobOptions, maxValue : 100, minValue: 1}
+
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
 const props = defineProps(['id', 'label'])
@@ -60,7 +67,8 @@ onMounted(() => {
   node.data = reactive({
     ...node.data,
     frequency: node.data.frequency ?? 400,
-    type: node.data.type ?? "lowpass"
+    type: node.data.type ?? "lowpass",
+    cv_in_level: node.data.cv_in_level ?? 1,
   })
 
   watch(node.data, () => {

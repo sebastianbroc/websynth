@@ -74,12 +74,27 @@ body {
     justify-content: start;
     gap: 10px;
     align-items: center;
+
+    &.cv {
+      justify-content: end;
+
+      &:before {
+        content: '';
+        background: black;
+        border: solid 0.5px black;
+        position: absolute;
+        transform: translate(-20px, -20px);
+        height: 15px;
+      }
+    }
   }
 
   input, select {
     background: var(--c-tertiary);
     border: none;
     border-radius: 5px;
+    height: 20px;
+    margin: 10px 0 10px 0;
   }
 }
 

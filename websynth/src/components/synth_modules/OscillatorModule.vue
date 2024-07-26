@@ -15,6 +15,10 @@
         <Handle type="target" class="custom_handle port_input" id="prop frequency"></Handle>
         <span style="margin: 0;">frequency</span>
       </div>
+      <div class="control_row cv">
+        <ControlKnob v-model="node.data.cv_in_level" :options="knobOptionsCV" v-if="store.state.inputType === 'knob'"></ControlKnob>
+        <input type="text" v-model="node.data.cv_in_level" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+      </div>
       <select v-model="node.data.waveform" v-on:change="emitChange">
         <option value="sine">Sine</option>
         <option value="sawtooth">Saw</option>
@@ -47,8 +51,10 @@ const knobOptions = {
   minValue: 0,
   maxValue: 20000,
   hideDefaultValue: false,
-  wheelFactor: 2
+  wheelFactor: 1
 }
+
+const knobOptionsCV = {...knobOptions, maxValue : 100, minValue: 1}
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
@@ -58,7 +64,8 @@ onMounted(() => {
   node.data = reactive({
     ...node.data,
     frequency: node.data.frequency ?? 400,
-    waveform: node.data.waveform ?? "sine"
+    waveform: node.data.waveform ?? "sine",
+    cv_in_level: node.data.cv_in_level ?? 1,
   })
 
   watch(node.data, () => {
