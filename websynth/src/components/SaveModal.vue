@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="modal loadmodal" :class="{visible: visible && type === 'load'}">
-      <h2>Select or drag-and-drop a valid .json patch file</h2>
+      <h2>Select a valid .json patch file</h2>
       <div class="text_input">
         <input type="file" id="patchfile" @change="loadFile">
       </div>

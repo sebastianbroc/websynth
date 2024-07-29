@@ -29,7 +29,7 @@ import {defineProps, defineEmits, onMounted, onBeforeMount, reactive, watch, inj
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
-const emit = defineEmits(['nodesChange', 'moduleChanged'])
+const emit = defineEmits(['nodesChange', 'moduleChanged', 'advanceStep'])
 const eventBus = inject("eventBus")
 const {node} = useNode()
 
@@ -50,6 +50,7 @@ const knobOptions = {
   wheelFactor: 2
 }
 
+
 onBeforeMount(() => {
   node.data = {
     ...node.data,
@@ -65,9 +66,8 @@ onMounted(() => {
     currentStep: 0
   })
 
-  watch(node.data, () => {
+  watch(node.data.steps, () => {
     emitChange();
-    if(node.data.currentStep > 15) node.data.currentStep = 0
   })
 })
 
@@ -78,6 +78,8 @@ let next = () => {
   } else {
     node.data.currentStep = 0
   }
+
+  emitAdvanceStep();
 }
 
 let buildStepsArray = (length) => {
@@ -90,6 +92,10 @@ let buildStepsArray = (length) => {
 
 let emitChange = () => {
   emit('moduleChanged', [{id: props.id, data: node.data}])
+}
+
+let emitAdvanceStep = () => {
+  emit('advanceStep', [{id: props.id, data: node.data}])
 }
 
 eventBus.on("triggerModule", (id) => {

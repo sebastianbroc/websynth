@@ -11,7 +11,7 @@
       <div class="control_row">
         <ControlKnob v-model="node.data.interval" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
         <input type="number" min="0" v-model="node.data.interval" v-if="store.state.inputType === 'text'">
-        <span class="triggered_light" :class="{active: node.data.triggered}"></span>
+        <span class="triggered_light" :class="{active: triggered}"></span>
         <span>interval</span>
       </div>
       <div class="divider_row"></div>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted, reactive} from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch, ref} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
@@ -46,29 +46,38 @@ const knobOptions = {
   wheelFactor: 1
 }
 
+let triggered = ref(false)
+
 onMounted(() => {
   node.data = reactive({
     ...node.data,
-    interval: node.data.interval ?? 1000,
-    triggered: false
+    interval: node.data.interval ?? 1000
   })
 
   trigger()
+
+  watch(node.data, () => {
+    emitChange();
+  })
 })
 
 let trigger = () => {
-  node.data.triggered = true
+  triggered.value = true
   setTimeout(turnOffTriggered, 100)
   emitTrigger()
   setTimeout(trigger, node.data.interval)
 }
 
 let turnOffTriggered = () => {
-  node.data.triggered = false
+  triggered.value = false
 }
 
 let emitTrigger = () => {
   emit('clockTrigger', [{id: props.id, data: node.data}])
+}
+
+let emitChange = () => {
+  emit('moduleChanged', [{id: props.id, data: node.data}])
 }
 </script>
 <style scoped>

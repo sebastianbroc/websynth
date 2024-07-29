@@ -29,16 +29,16 @@
         <CursorModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-sequencer="customNodeProps">
-        <SequencerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
+        <SequencerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" @advanceStep="advanceStep" />
       </template>
       <template #node-clock="customNodeProps">
-        <ClockModule v-bind="customNodeProps" @clockTrigger="clockTrigger($event[0].id)" />
+        <ClockModule v-bind="customNodeProps" @clockTrigger="clockTrigger($event[0].id)" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-midi="customNodeProps">
         <MidiModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-comment="customNodeProps">
-        <CommentModule v-bind="customNodeProps" />
+        <CommentModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')"/>
       </template>
     </VueFlow>
   </div>
@@ -217,6 +217,11 @@ eventBus.on("modal-click-save", (param) => {
 })
 
 eventBus.on("modal-click-load", (param) => {
+  //reset the workspace - delete all elements and pause playback to ensure the new patch is loaded in correctly
+  eventBus.emit("navBar-click", 'reset workspace')
+  eventBus.emit("navBar-click", 'pause playback')
+  let elements = vueFlowInstance.getElements
+  emit('updateElements', elements)
   saveModalVisible.value = false
   store.commit('changeModalOpened', false)
 
@@ -240,6 +245,9 @@ eventBus.on("element_update", (elements) => {
   elements = elements.toString()
   fromObject(JSON.parse(elements))
   elements = vueFlowInstance.getElements
+  let max = elements._value.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
+  max = Math.max(...max)
+  initializeId(max === -Infinity ? 0 : max + 1)
   emit('updateElements', elements)
 })
 
@@ -297,6 +305,13 @@ const clockTrigger = (id) => {
     getModuleChildren(id).forEach(child => {
       eventBus.emit("triggerModule", child.targetNode.id)
     })
+  }
+}
+
+const advanceStep = () => {
+  if (vueFlowInstance) {
+    let elements = vueFlowInstance.getElements
+    emit('updateElements', elements)
   }
 }
 
