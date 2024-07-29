@@ -136,6 +136,7 @@ export default {
   a {
     padding: 0 4px 0 4px;
     border-radius: 2px;
+    white-space: nowrap;
 
     &:hover {
       cursor: pointer;

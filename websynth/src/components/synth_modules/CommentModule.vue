@@ -3,15 +3,16 @@
     <div class="controls">
       <img class="icon" src="@/assets/icons/icon_comment.png">
       <div class="control_row">
-        <textarea v-model="node.data.comment" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' placeholder="Your Comment here..."></textarea>
+        <textarea v-model="node.data.comment" @load='this.style.height = "";this.style.height = this.scrollHeight + "px"' oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' placeholder="Your Comment here..."></textarea>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import {defineProps, onMounted, reactive} from 'vue'
+import {defineEmits, defineProps, onMounted, reactive, watch} from 'vue'
 import {useNode} from "@vue-flow/core";
+const emit = defineEmits(['moduleChanged'])
 const {node} = useNode()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
@@ -24,7 +25,15 @@ onMounted(() => {
     ...node.data,
     comment: node.data.comment ?? ""
   })
+
+  watch(node.data, () => {
+    emitChange();
+  })
 })
+
+let emitChange = () => {
+  emit('moduleChanged', [{id: props.id, data: node.data}])
+}
 
 </script>
 <style scoped>

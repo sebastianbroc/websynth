@@ -22,18 +22,22 @@ export default function useWebsocket() {
         socket.close()
     }
 
-    function createSession(pass, patch){
-        socket.send(JSON.stringify({msg: "new session", password: pass, patch: patch}))
+    function createSession(prop, patch){
+        socket.send(JSON.stringify({msg: "new session", username: prop.username, password: prop.password, patch: patch}))
     }
 
-    function joinSession(id, pass){
-        socket.send(JSON.stringify({msg: "join session", id: id, password: pass}))
+    function joinSession(id, pass, username){
+        socket.send(JSON.stringify({msg: "join session", id: id, password: pass, username: username}))
     }
 
     function sendChange(change, type){
         if(socket){
             socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change), type: type}))
         }
+    }
+
+    function sendInviteDecision(accept, id, patch){
+        socket.send(JSON.stringify({msg: "inviteDecision", accept: accept, userid: id, patch: patch}))
     }
 
     function onSocketMessage(evt){
@@ -56,6 +60,19 @@ export default function useWebsocket() {
         } else if (data.error){
             store.commit('changeError', data.error)
             socket.close()
+        } else if (data.info){
+            store.commit("changeInfo", data.info)
+        } else if (data.acceptNewUser) {
+            store.commit("changeNotifications", data.acceptNewUser.map(u => {return {...u, "type": "acceptNewUser"}}))
+        } else if(data.acceptance_status) {
+            if(data.acceptance_status === "y"){
+                store.commit('changeWebsocketConnected', true)
+                store.commit('changeSessionID', data.joined_session_id)
+                eventBus.emit("element_update", data.acceptance_patch)
+            } else {
+                store.commit('changeError', "Your request to join the session " + data.joined_session_id + " has been declined.")
+                store.commit('changeInfo', null)
+            }
         } else if (data.element_update){
             eventBus.emit("element_update", data.element_update)
         } else if (data.change){
@@ -74,6 +91,7 @@ export default function useWebsocket() {
         createSession,
         joinSession,
         sendChange,
-        closeSession
+        closeSession,
+        sendInviteDecision
     }
 }

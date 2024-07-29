@@ -7,6 +7,8 @@ export default createStore({
     websocketConnected: false,
     sessionID: null,
     error: null,
+    info: null,
+    notifications: [],
     inputType: "knob"
   },
   getters: {
@@ -26,6 +28,12 @@ export default createStore({
     },
     changeError(state, p) {
       state.error = p
+    },
+    changeInfo(state, p) {
+      state.info = p
+    },
+    changeNotifications(state, p){
+      state.notifications = p
     },
     toggleInputType(state){
       state.inputType = state.inputType === "knob" ? "text" : "knob"

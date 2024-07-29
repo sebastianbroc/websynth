@@ -1,6 +1,7 @@
 <template>
   <div class="workspace" @drop="onDrop">
     <button @click="updateCursorPosition('2')" style="display: none;">Update</button>
+    <NotificationCenter></NotificationCenter>
     <ModuleBar></ModuleBar>
     <SaveModal :visible="saveModalVisible" :type="modalType" :session="querySession"></SaveModal>
     <div class="disable_workspace" :class="{active: store.state.modalOpened}"></div>
@@ -52,6 +53,7 @@ import {useVueFlow} from '@vue-flow/core';
 import download from 'downloadjs';
 import '@vue-flow/minimap/dist/style.css'
 import ModuleBar from "@/components/ModuleBar.vue"
+import NotificationCenter from "@/components/NotificationCenter.vue";
 import SaveModal from "@/components/SaveModal.vue";
 import {ref, markRaw, onMounted, inject} from 'vue';
 import {useStore} from 'vuex';
@@ -78,7 +80,7 @@ const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
 
-let {startConnection, createSession, joinSession, sendChange, closeSession} = useWebsocket()
+let {startConnection, createSession, joinSession, sendChange, closeSession, sendInviteDecision} = useWebsocket()
 let router = useRouter()
 
 // eslint-disable-next-line no-undef
@@ -240,7 +242,7 @@ eventBus.on("modal-click-start_collaboration", (param) => {
 
 eventBus.on("modal-click-join_collaboration", (param) => {
   startConnection(() => {
-    joinSession(param.id, param.password)
+    joinSession(param.id, param.password, param.username)
   })
 })
 
@@ -273,6 +275,10 @@ eventBus.on("node_change", (change) => {
 
   let elements = vueFlowInstance.getElements
   emit('updateElements', elements)
+})
+
+eventBus.on("handleInvite", (params) => {
+  sendInviteDecision(params.accept, params.userid, JSON.stringify(toObject()))
 })
 
 const updateCursorPosition = (id) => {

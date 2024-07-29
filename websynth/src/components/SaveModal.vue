@@ -34,34 +34,40 @@
       <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && collaboration_type === 'create'}">
         <h2>Start Collaboration</h2>
         <div class="text_input">
+          <input type="text" v-model="username" placeholder="your name"><br>
           <input type="password" v-model="password" placeholder="session password"><br>
           <input type="password" v-model="retypePassword" placeholder="repeat password"><br>
           <p class="help_text">Set a password if you want to limit access to your session.<br>Otherwise, leave the fields blank.</p>
         </div>
         <div class="buttonWrapper">
           <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
-          <button @click="emitEvent('start_collaboration_button')" :disabled="(password || retypePassword) && (password !== retypePassword)">start collaborating</button>
+          <button @click="emitEvent('start_collaboration_button')" :disabled="((password || retypePassword) && (password !== retypePassword) || !username)">start collaborating</button>
         </div>
       </div>
       <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && !store().state.sessionID && collaboration_type === 'join'}">
         <h2>Join Session</h2>
-        <div class="text_input">
+        <div class="text_input" v-if="!store().state.info">
+          <input type="text" v-model="username" placeholder="your name"><br>
           <input type="text" v-model="existingSessionID" placeholder="session id"><br>
           <input type="password" v-model="password" placeholder="session password"><br>
           <p class="help_text error" v-if="store().state.error">{{store().state.error}}</p>
           <p class="help_text">Enter the Session ID you got from the host to join.</p>
           <p class="help_text"><b class="help_text error">Warning:</b> Your current patch will get overwritten by the remote session's patch. Save your patch before joining if you want to keep it!</p>
         </div>
+        <div class="text_input" v-if="store().state.info" style="display: flex; flex-direction: column; align-items: center">
+          <span class="loader"></span>
+          <p class="help_text">{{store().state.info}}</p>
+        </div>
         <div class="buttonWrapper">
-          <button @click="emitEvent('cancel', true)" class="cancel">cancel</button>
-          <button @click="emitEvent('join_collaboration_button')" :disabled="!existingSessionID">join</button>
+          <button @click="emitEvent('cancel', true); store().commit('changeInfo', null); store().commit('changeError', null);" class="cancel">cancel</button>
+          <button @click="emitEvent('join_collaboration_button')" :disabled="!existingSessionID || !username" v-if="!store().state.info">join</button>
         </div>
       </div>
     </div>
     <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && store().state.sessionID && collaboration_type === 'create'}">
       <h2>Your Session has been successfully created!</h2>
       <p>Your Session ID is: <b>{{store().state.sessionID}}</b></p>
-      <p>Use this link to invite collaborators: <i><a :href="'http://localhost:8080/?session=' + store().state.sessionID">{{"http://localhost:8080/?session=" + store().state.sessionID}}</a></i></p>
+      <p>Use this link to invite collaborators: <i><a :href="'https://sebastianbroc.github.io/websynth/?session=' + store().state.sessionID">{{"https://sebastianbroc.github.io/websynth/?session=" + store().state.sessionID}}</a></i></p>
       <div class="buttonWrapper">
         <button @click="emitEvent('cancel', true)" class="finish">start patching</button>
       </div>
@@ -84,6 +90,7 @@ export default {
   inject: ["eventBus"],
   data() {
     return {
+      username: null,
       patchname: null,
       patch: null,
       password: null,
@@ -108,9 +115,9 @@ export default {
       } else if (type === "load"){
         this.eventBus.emit("modal-click-load", this.patch)
       } else if (type === "start_collaboration_button"){
-        this.eventBus.emit("modal-click-start_collaboration", this.password)
+        this.eventBus.emit("modal-click-start_collaboration", {username: this.username, password: this.password})
       } else if(type === "join_collaboration_button"){
-        this.eventBus.emit("modal-click-join_collaboration", {id: this.existingSessionID, password: this.password})
+        this.eventBus.emit("modal-click-join_collaboration", {id: this.existingSessionID, username: this.username, password: this.password})
       } else if (type === "cancel"){
         this.eventBus.emit("modal-click-cancel")
       }
@@ -130,6 +137,7 @@ export default {
       reader.readAsText(file);
     },
     resetFields(){
+      this.username = null
       this.patch = null
       this.patchname = null
       this.password = null
@@ -240,4 +248,28 @@ export default {
     }
   }
 }
+
+.loader{
+  display: block;
+  position: relative;
+  height: 20px;
+  width: 140px;
+  background-image:
+      linear-gradient(#FFF 20px, transparent 0),
+      linear-gradient(#FFF 20px, transparent 0),
+      linear-gradient(#FFF 20px, transparent 0),
+      linear-gradient(#FFF 20px, transparent 0);
+  background-repeat: no-repeat;
+  background-size: 20px auto;
+  background-position: 0 0, 40px 0, 80px 0, 120px 0;
+  animation: pgfill 1s linear infinite;
+}
+@keyframes pgfill {
+  0% {   background-image: linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0); }
+  25% {   background-image: linear-gradient(var(--c-primary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0); }
+  50% {   background-image: linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-primary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0); }
+  75% {   background-image: linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-primary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0); }
+  100% {   background-image: linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-secondary) 20px, transparent 0), linear-gradient(var(--c-primary) 20px, transparent 0); }
+}
+
 </style>
