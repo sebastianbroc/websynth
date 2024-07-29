@@ -18,6 +18,10 @@ export default function useWebsocket() {
         socket.onclose = onSocketClose
     }
 
+    function closeSession(){
+        socket.close()
+    }
+
     function createSession(pass, patch){
         socket.send(JSON.stringify({msg: "new session", password: pass, patch: patch}))
     }
@@ -69,6 +73,7 @@ export default function useWebsocket() {
         startConnection,
         createSession,
         joinSession,
-        sendChange
+        sendChange,
+        closeSession
     }
 }

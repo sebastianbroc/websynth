@@ -78,7 +78,7 @@ const eventBus = inject("eventBus")
 
 let vueFlowInstance = null;
 
-let {startConnection, createSession, joinSession, sendChange} = useWebsocket()
+let {startConnection, createSession, joinSession, sendChange, closeSession} = useWebsocket()
 let router = useRouter()
 
 // eslint-disable-next-line no-undef
@@ -189,6 +189,9 @@ eventBus.on("navBar-click", (param) => {
       saveModalVisible.value = true
       store.commit('changeModalOpened', true)
       modalType.value = "start_collaboration"
+      break;
+    case "end collaboration":
+      closeSession()
       break;
     case "toggle input display":
       store.commit("toggleInputType")
