@@ -69,6 +69,7 @@ onMounted(() => {
   })
 
   watch(node.data, () => {
+    node.data.frequency = node.data.frequency === 0 ? "0" : node.data.frequency
     emitChange();
   })
 })
