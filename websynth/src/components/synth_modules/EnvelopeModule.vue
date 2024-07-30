@@ -40,6 +40,13 @@
           <span>ms</span>
         </div>
       </div>
+      <div class="control_row">
+        <span>intensity</span>
+        <div class="control_row">
+          <input type="number" min="0" v-model="node.data.intensity" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
+          <ControlKnob v-model="node.data.intensity" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
+        </div>
+      </div>
       <div class="divider_row"></div>
       <div class="ports">
         <div><Handle type="source" class="custom_handle port_input" id="clock_in" :position="Position.Left" /><span>trigger in</span></div>
@@ -50,13 +57,12 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted, reactive, watch, inject} from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange','moduleChanged'])
 const {node} = useNode()
-const eventBus = inject("eventBus")
 
 // props were passed from the slot using `v-bind="customNodeProps"`
 //eslint-disable-next-line
@@ -82,7 +88,7 @@ onMounted(() => {
     decay: node.data.decay ?? 10,
     sustain: node.data.sustain ?? 10,
     release: node.data.release ?? 10,
-    triggered: node.data.triggered ?? false
+    intensity: node.data.intensity ?? 1
   })
 
   watch(node.data, () => {
@@ -90,21 +96,9 @@ onMounted(() => {
   })
 })
 
-let trigger = () => {
-  node.data.triggered = true
-  emitChange()
-}
-
 let emitChange = () => {
   emit('moduleChanged', [{id: props.id, data: node.data}])
-  node.data.triggered = false
 }
-
-eventBus.on("triggerModule", (id) => {
-  if(id === props.id){
-    trigger();
-  }
-})
 </script>
 <style scoped>
 span {

@@ -34,7 +34,7 @@ import {defineProps, defineEmits, onMounted, reactive, watch, ref} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
-const emit = defineEmits(['nodesChange', 'clockTrigger'])
+const emit = defineEmits(['nodesChange', 'clockTrigger', 'moduleChanged'])
 const {node} = useNode()
 
 //eslint-disable-next-line

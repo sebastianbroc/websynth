@@ -30,7 +30,7 @@
         <CursorModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" />
       </template>
       <template #node-sequencer="customNodeProps">
-        <SequencerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" @advanceStep="advanceStep" />
+        <SequencerModule v-bind="customNodeProps" @moduleChanged="getModules($event, 'data')" @advanceStep="advanceStep($event)" />
       </template>
       <template #node-clock="customNodeProps">
         <ClockModule v-bind="customNodeProps" @clockTrigger="clockTrigger($event[0].id)" @moduleChanged="getModules($event, 'data')" />
@@ -84,7 +84,7 @@ let {startConnection, createSession, joinSession, sendChange, closeSession, send
 let router = useRouter()
 
 // eslint-disable-next-line no-undef
-const emit = defineEmits(['updateElements', 'triggerModule'])
+const emit = defineEmits(['updateElements', 'triggerModule', 'elementChanges'])
 const saveModalVisible = ref(false)
 const modalType = ref("")
 const querySession = ref(router.currentRoute.value.query.session)
@@ -300,10 +300,14 @@ const getModules = (changes, type) => {
     let elements = vueFlowInstance.getElements
     emit('updateElements', elements)
     set("flow", JSON.stringify(toObject()))
-    if(store.state.websocketConnected){
-      if(changes && Array.isArray(changes))
+
+    if(changes && Array.isArray(changes)){
       changes.forEach(change => {
-        sendChange(change, type)
+        emit('elementChanges', elements._value.find(e => e.id === change.id))
+
+        if(store.state.websocketConnected){
+          sendChange(change, type)
+        }
       })
     }
   }
@@ -317,10 +321,10 @@ const clockTrigger = (id) => {
   }
 }
 
-const advanceStep = () => {
+const advanceStep = (module) => {
   if (vueFlowInstance) {
     let elements = vueFlowInstance.getElements
-    emit('updateElements', elements)
+    emit('elementChanges', elements._value.find(e => e.id === module[0].id))
   }
 }
 

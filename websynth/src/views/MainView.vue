@@ -2,7 +2,7 @@
   <div class="main">
     <NavBar></NavBar>
     <p id="audioNodeList">{{audioNodeList}}</p>
-    <WorkSpace @updateElements="updateElements"></WorkSpace>
+    <WorkSpace @updateElements="updateElements" @elementChanges="handleChanges"></WorkSpace>
   </div>
 </template>
 
@@ -41,6 +41,10 @@ export default {
         this.mainVolume.disconnect();
       }
     })
+
+    this.eventBus.on("triggerModule", (moduleId) => {
+      this.triggerModule(moduleId)
+    })
   },
   methods: {
     initAudio(){
@@ -54,17 +58,33 @@ export default {
         node.connected = false
       })
     },
-    updateElements(value){
-      //console.log("updating elements")
-      this.elements = value
+    handleChanges(input){
+      if(input){
+        this.handleNodeList(input)
 
-      this.elements.filter(e => e.type !== "default" && e.type !== "output").forEach(module => {
-        this.handleNodeList(module)
-      })
+        this.elements.filter(e => e.type !== "default" && e.type !== "output").forEach(module => {
+          this.buildConnection(module)
+        })
+      }
+    },
+    triggerModule(id){
+      let module = this.elements.find(m => m.id === id)
+
+      switch(module.type){
+        case 'envelope':
+          try{
+            this.audioNodeList.find(n => n.id === module.id).module.trigger();
+          } catch {
+            //the module has likely not been created yet
+          }
+          break;
+      }
+    },
+    updateElements(value){
+      this.elements = value
       this.elements.filter(e => e.type !== "default" && e.type !== "output").forEach(module => {
         this.buildConnection(module)
       })
-
       this.handleOrphans()
     },
     getModuleChild(id){
@@ -170,14 +190,10 @@ export default {
             break;
           case 'envelope':
             if(isNewNode){
-              Node = new EnvelopeGenerator(this.audioContext, (module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
+              Node = new EnvelopeGenerator(this.audioContext, (module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100), module.data.intensity)
               createdNewNode = true
             } else {
-              Node.updateData((module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100))
-            }
-
-            if(module.data.triggered){
-              Node.trigger()
+              Node.updateData((module.data.attack / 100), (module.data.decay / 100), (module.data.sustain / 100), (module.data.release / 100), module.data.intensity)
             }
             break;
           case 'vca':
