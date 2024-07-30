@@ -101,7 +101,12 @@ export default {
                   } else {
                     if(target.targetHandle.includes("prop")){
                       console.log("connecting to " + target.targetHandle.substring(5))
-                      sourceModule.connect(targetAudioNode.cvControls[target.targetHandle.substring(5)])
+
+                      if(source.handleBounds.source[0].id.includes("out") && source.handleBounds.source[0].id.substring(4) === "audio"){
+                        sourceModule.connect(targetAudioNode.cvControls[target.targetHandle.substring(5)])
+                      } else {
+                        sourceModule.connect(targetAudioNode.module[target.targetHandle.substring(5)])
+                      }
                       try{
                         sourceModule.start();
                       } catch {

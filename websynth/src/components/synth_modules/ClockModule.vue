@@ -14,6 +14,13 @@
         <span class="triggered_light" :class="{active: triggered}"></span>
         <span>interval</span>
       </div>
+      <div class="control_row" style="justify-content: space-between;">
+        <button @click="togglePause" style="margin-left: 3px;">
+          <img alt="pause button" class="icon" src="@/assets/icons/icon_pause.png" v-if="!node.data.paused">
+          <img alt="play button" class="icon" src="@/assets/icons/icon_play.png" v-if="node.data.paused">
+        </button>
+        <span>play/pause</span>
+      </div>
       <div class="divider_row"></div>
       <div class="control_row">
         <div><Handle type="source" class="custom_handle port_output" :position="Position.Bottom"/><span>output</span></div>
@@ -51,7 +58,8 @@ let triggered = ref(false)
 onMounted(() => {
   node.data = reactive({
     ...node.data,
-    interval: node.data.interval ?? 1000
+    interval: node.data.interval ?? 1000,
+    paused: node.data.paused ?? false
   })
 
   trigger()
@@ -61,11 +69,18 @@ onMounted(() => {
   })
 })
 
+let togglePause = () => {
+  node.data.paused = !node.data.paused;
+  trigger()
+}
+
 let trigger = () => {
-  triggered.value = true
-  setTimeout(turnOffTriggered, 100)
-  emitTrigger()
-  setTimeout(trigger, node.data.interval)
+  if(!node.data.paused){
+    triggered.value = true
+    setTimeout(turnOffTriggered, 100)
+    emitTrigger()
+    setTimeout(trigger, node.data.interval)
+  }
 }
 
 let turnOffTriggered = () => {
@@ -88,6 +103,7 @@ span {
 .controls {
   display: flex;
   flex-direction: column;
+  gap: 5px;
 
   .control_row {
     display: flex;
@@ -128,5 +144,23 @@ p {
 
 input[type=number] {
   width: 50px;
+}
+
+button {
+  cursor: pointer;
+  background: var(--c-secondary);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+
+  img {
+    width: 20px;
+  }
+
+  &:hover {
+    background: var(--lighten);
+  }
 }
 </style>

@@ -16,7 +16,11 @@ export default function EnvelopeGenerator(context, a, d, s, r) {
     EnvelopeGenerator.prototype.trigger = function() {
         if(this.param){
             let now = this.context.currentTime;
-            this.param.cancelScheduledValues(now);
+            try{
+                this.param.cancelScheduledValues(now);
+            }catch(e){
+                //do nothing
+            }
             this.param.setValueAtTime(0, now);
             this.param.linearRampToValueAtTime(1, now + this.attackTime);
             this.param.linearRampToValueAtTime(0.5, now + this.attackTime + this.decayTime);

@@ -27,7 +27,7 @@
       </select>
       <div class="divider_row"></div>
       <div class="control_row">
-        <Handle type="source" class="custom_handle port_output" :position="Position.Bottom" /><span>output</span>
+        <Handle type="source" class="custom_handle port_output" id="out audio" :position="Position.Bottom" /><span>output</span>
       </div>
     </div>
   </div>
