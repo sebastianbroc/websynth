@@ -1,5 +1,5 @@
 <template>
-  <div class="workspace" @drop="onDrop">
+  <div class="workspace" @drop="getModules([onDrop($event)], 'create');">
     <button @click="updateCursorPosition('2')" style="display: none;">Update</button>
     <NotificationCenter></NotificationCenter>
     <ModuleBar></ModuleBar>
@@ -248,33 +248,45 @@ eventBus.on("modal-click-join_collaboration", (param) => {
 
 eventBus.on("element_update", (elements) => {
   elements = elements.toString()
-  fromObject(JSON.parse(elements))
-  elements = vueFlowInstance.getElements
-  let max = elements._value.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
-  max = Math.max(...max)
-  initializeId(max === -Infinity ? 0 : max + 1)
-  emit('updateElements', elements)
+  fromObject(JSON.parse(elements)).then(() => {
+    elements = vueFlowInstance.getElements
+    let max = elements._value.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
+    max = Math.max(...max)
+    initializeId(max === -Infinity ? 0 : max + 1)
+    emit('updateElements', elements)
+  })
 })
 
 eventBus.on("node_change", (change) => {
-  if(change.type === "nodes"){
-    applyNodeChanges([JSON.parse(change.change)])
-  } else if (change.type === "edges") {
-    applyEdgeChanges([JSON.parse(change.change)])
-  } else if(change.type === "data"){
-    change = JSON.parse(change.change)
-
-    let nodes = toObject()
-    nodes.nodes.forEach(node => {
-      if(node.id === change.id){
-        node.data = change.data
-      }
-    })
-    fromObject(nodes)
+  let nodes = null
+  switch(change.type){
+    case "nodes":
+      applyNodeChanges([JSON.parse(change.change)])
+      break;
+    case "create":
+      nodes = toObject()
+      nodes.nodes.push(JSON.parse(change.change))
+      fromObject(nodes)
+      break;
+    case "edges":
+      applyEdgeChanges([JSON.parse(change.change)])
+      break;
+    case "data":
+      change = JSON.parse(change.change)
+      nodes = toObject()
+      nodes.nodes.forEach(node => {
+        if(node.id === change.id){
+          Object.assign(node.data, change.data)
+        }
+      })
+      fromObject(nodes)
+      break;
   }
 
   let elements = vueFlowInstance.getElements
+  eventBus.emit("remountModules", {})
   emit('updateElements', elements)
+  emit('elementChanges', elements._value.find(e => e.id === change.id))
 })
 
 eventBus.on("handleInvite", (params) => {

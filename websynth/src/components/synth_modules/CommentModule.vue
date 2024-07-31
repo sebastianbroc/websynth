@@ -10,9 +10,10 @@
 </template>
 
 <script setup>
-import {defineEmits, defineProps, onMounted, reactive, watch} from 'vue'
+import {defineEmits, defineProps, inject, onMounted, reactive, watch} from 'vue'
 import {useNode} from "@vue-flow/core";
 const emit = defineEmits(['moduleChanged'])
+const eventBus = inject("eventBus")
 const {node} = useNode()
 
 // props were passed from the slot using `v-bind="customNodeProps"`
@@ -21,6 +22,10 @@ const props = defineProps(['id', 'label'])
 
 
 onMounted(() => {
+  mount()
+})
+
+let mount = () => {
   node.data = reactive({
     ...node.data,
     comment: node.data.comment ?? ""
@@ -29,6 +34,10 @@ onMounted(() => {
   watch(node.data, () => {
     emitChange();
   })
+}
+
+eventBus.on('remountModules', () => {
+  mount()
 })
 
 let emitChange = () => {

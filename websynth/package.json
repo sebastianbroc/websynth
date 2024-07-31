@@ -13,6 +13,7 @@
     "@vue-flow/core": "^1.33.6",
     "@vue-flow/minimap": "^1.4.0",
     "core-js": "^3.8.3",
+    "debounce": "^2.1.0",
     "downloadjs": "^1.4.7",
     "idb-keyval": "^6.2.1",
     "mitt": "^3.0.1",

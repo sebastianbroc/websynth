@@ -30,11 +30,12 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted, reactive, watch, ref} from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch, ref, inject} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange', 'clockTrigger', 'moduleChanged'])
+const eventBus = inject("eventBus")
 const {node} = useNode()
 
 //eslint-disable-next-line
@@ -56,6 +57,10 @@ const knobOptions = {
 let triggered = ref(false)
 
 onMounted(() => {
+  mount()
+})
+
+let mount = () => {
   node.data = reactive({
     ...node.data,
     interval: node.data.interval ?? 1000,
@@ -67,6 +72,10 @@ onMounted(() => {
   watch(node.data, () => {
     emitChange();
   })
+}
+
+eventBus.on('remountModules', () => {
+  mount()
 })
 
 let togglePause = () => {

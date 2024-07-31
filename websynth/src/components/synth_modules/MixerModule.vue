@@ -43,11 +43,12 @@
 </template>
 
 <script setup>
-import {defineProps, defineEmits, onMounted, reactive, watch} from 'vue'
+import {defineProps, defineEmits, onMounted, reactive, watch, inject} from 'vue'
 import {Handle, Position, useNode} from "@vue-flow/core";
 import store from "@/store";
 import ControlKnob from "@slipmatio/control-knob";
 const emit = defineEmits(['nodesChange','moduleChanged'])
+const eventBus = inject("eventBus")
 const {node} = useNode()
 
 const knobOptions = {
@@ -68,6 +69,10 @@ const knobOptions = {
 const props = defineProps(['id', 'label'])
 
 onMounted(() => {
+  mount()
+})
+
+let mount = () => {
   node.data = reactive({
     ...node.data,
     volumes: node.data.volumes ?? [1,1,1,1],
@@ -77,6 +82,10 @@ onMounted(() => {
   watch(node.data, () => {
     emitChange();
   })
+}
+
+eventBus.on('remountModules', () => {
+  mount()
 })
 
 let emitChange = () => {

@@ -60,6 +60,10 @@ onBeforeMount(() => {
 })
 
 onMounted(() => {
+  mount()
+})
+
+let mount = () => {
   node.data = reactive({
     ...node.data,
     steps : buildStepsArray(16),
@@ -69,6 +73,10 @@ onMounted(() => {
   watch(node.data.steps, () => {
     emitChange();
   })
+}
+
+eventBus.on('remountModules', () => {
+  mount()
 })
 
 //eslint-disable-next-line

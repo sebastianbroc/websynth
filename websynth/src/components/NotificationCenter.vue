@@ -49,6 +49,20 @@ export default {
       display: flex;
       justify-content: end;
       gap: 5px;
+
+      button {
+        cursor: pointer;
+        background: var(--c-secondary);
+        border-radius: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+
+        &:hover {
+          background: var(--lighten);
+        }
+      }
     }
   }
 }

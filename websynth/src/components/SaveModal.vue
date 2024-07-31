@@ -76,7 +76,7 @@
       <h2>You have successfully joined the Session!</h2>
       <p>You are now Part of the Session <b>{{store().state.sessionID}}</b>!</p>
       <div class="buttonWrapper">
-        <button @click="emitEvent('cancel', true)" class="finish">start patching</button>
+        <button @click="emitEvent('cancel', true); sendRemount();" class="finish">start patching</button>
       </div>
     </div>
   </div>
@@ -123,6 +123,9 @@ export default {
       }
 
       if(reset) this.resetFields()
+    },
+    sendRemount(){
+      this.eventBus.emit("remountModules", {})
     },
     loadFile(e){
       let files = e.target.files || e.dataTransfer.files;

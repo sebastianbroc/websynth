@@ -30,7 +30,7 @@ export default function useWebsocket() {
         socket.send(JSON.stringify({msg: "join session", id: id, password: pass, username: username}))
     }
 
-    function sendChange(change, type){
+    let sendChange = (change, type) => {
         if(socket){
             socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change), type: type}))
         }
