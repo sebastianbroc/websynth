@@ -14,9 +14,11 @@ Wenn beispielsweise mehr als eine Person gleichzeitig an dem Synthesizer arbeite
 Das Web bietet durch seine geräteunabhängige Zugänglichkeit viele Vorteile, welche es attraktiv für die Nachbildung eines Modular-Synthesizers im Web machen. Besonders unter dem Gesichtspunkt der Kollaboration über Distanz besteht Potenzial, den beschriebenen Nachteilen eines physischen Synthesizers entgegenzuwirken.
 
 # Wie funktioniert das System?
-Die Generierung von Audio erfolgt über die [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), welches als Standard von einer Arbeitsgruppe der [W3C](https://www.w3.org/) entwickelt wird und somit eine Grundlage mit starkem Backing bietet. Detailliertere Informationen über den Tech-Stack und die Systemarchitektur sind dem [Wiki](https://github.com/sebastianbroc/websynth/wiki) zu entnehmen. 
+Die Generierung von Audio erfolgt über die [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), welche als Standard von einer Arbeitsgruppe der [W3C](https://www.w3.org/) entwickelt wird und somit eine Grundlage mit starkem Backing bietet. Detailliertere Informationen über den Tech-Stack und die Systemarchitektur sind dem [Wiki](https://github.com/sebastianbroc/websynth/wiki) zu entnehmen. 
 
 Während des Projekts getroffene Architekturentscheidungen wurden anhand von [Architectural Decision Records (ADRS)](https://adr.github.io/) im Markdown-Format dokumentiert und sind [hier](https://github.com/sebastianbroc/websynth/tree/main/docs/decisions) zu finden.
 
 # Wo kann es genutzt werden?
 Das System ist via GitHub Pages unter diesem Link verfügbar: https://sebastianbroc.github.io/websynth/
+
+Unter dem Menüpunkt "patch" können Beispiel-Patches geladen werden, um einen Ausgangspunkt zu erhalten, falls dir Modular-Synthesizer grundsätzlich neu sind.
