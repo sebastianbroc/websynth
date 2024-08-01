@@ -22,3 +22,9 @@ Während des Projekts getroffene Architekturentscheidungen wurden anhand von [Ar
 Das System ist via GitHub Pages unter diesem Link verfügbar: https://sebastianbroc.github.io/websynth/
 
 Unter dem Menüpunkt "patch" können Beispiel-Patches geladen werden, um einen Ausgangspunkt zu erhalten, falls dir Modular-Synthesizer grundsätzlich neu sind.
+
+
+## Beispiel-Videos
+[Performance-Video 01](https://youtu.be/sP62KJTY43U)
+
+[Performance-Video 02](https://youtu.be/TH50pn13A24)
