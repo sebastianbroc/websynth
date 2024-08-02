@@ -26,6 +26,12 @@ body {
   background: var(--c-primary);
 }
 
+@media only screen and (max-width: 500px) {
+  .hide-on-small-vp {
+    display: none;
+  }
+}
+
 .warning {
   animation: warning-color 1s infinite;
 }

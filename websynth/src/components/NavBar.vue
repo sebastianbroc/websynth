@@ -2,7 +2,7 @@
   <div class="navbar">
     <div class="navbar-content one-third">
       <a><b>websynth</b> //</a>
-      <div class="category">
+      <div class="category hide-on-small-vp">
         <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">patch</a>
         <div class="options">
           <button @click="emitEvent('save patch to file')">save patch to file</button>
@@ -13,13 +13,13 @@
           <button @click="loadSamplepatch('melodic_robot')" :disabled="store().state.websocketConnected">melodic robot</button>
         </div>
       </div>
-      <div class="category">
+      <div class="category hide-on-small-vp">
         <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">view</a>
         <div class="options">
           <button @click="emitEvent('toggle input display')"><span v-if="store().state.inputType === 'text'">✓ </span>display inputs as text</button>
         </div>
       </div>
-      <div class="category">
+      <div class="category hide-on-small-vp">
         <a @click="e => {hideOtherMenus(e.target); e.target.classList.toggle('active');}">options</a>
         <div class="options">
           <button @click="emitEvent('reset workspace')">reset workspace</button>

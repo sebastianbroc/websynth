@@ -50,9 +50,6 @@ export default function useWebsocket() {
             data = {}
         }
 
-        console.log(data)
-
-
         if(data.session_id){
             store.commit('changeWebsocketConnected', true)
             store.commit('changeSessionID', data.session_id)
