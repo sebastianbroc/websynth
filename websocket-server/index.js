@@ -6,7 +6,6 @@ console.log("\x1b[32m websynth websocket server started on port " + 8085 + " \x1
 let sessions = []
 
 wss.on('connection', function connection(ws) {
-    //console.log("new connection")
 
     ws.on('message', function message(data) {
         data = data.toString()
@@ -124,10 +123,12 @@ function makeUserid(length) {
 }
 
 function removeOrphans(){
+    console.log("removing orphans now...")
     sessions.forEach((session, index) => {
         session.users.forEach((user, userindex) => {
-            if (user.readyState === 3){
+            if (user.ws.readyState === 3){
                 session.users.splice(userindex, 1)
+                removeCursor(session, user.userid)
             }
         })
 
@@ -135,5 +136,12 @@ function removeOrphans(){
             console.log("\x1b[31m deleting orphaned session " + session.id + "...\x1b[0m")
             sessions.splice(index, 1)
         }
+    })
+}
+
+function removeCursor(session, user_id) {
+    //if a user leaves the collab session, his cursor has to be removed so other users don't see ghosts
+    session.users.forEach(user => {
+        user.ws.send(JSON.stringify({"change": JSON.stringify({"id": user_id, "type": "remove"}), "type": "nodes"}))
     })
 }

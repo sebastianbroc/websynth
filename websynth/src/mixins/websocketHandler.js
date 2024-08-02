@@ -92,6 +92,7 @@ export default function useWebsocket() {
         socketConnected.value = false
         store.commit('changeWebsocketConnected', false)
         store.commit('changeSessionID', null)
+        eventBus.emit("removeCursors")
     }
 
     return {

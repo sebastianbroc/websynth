@@ -299,7 +299,7 @@ export default {
           this.audioNodeList.splice(index, 1)
         }
       })
-    },
+    }
   }
 }
 </script>

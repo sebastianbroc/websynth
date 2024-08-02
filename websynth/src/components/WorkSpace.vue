@@ -162,12 +162,7 @@ onMounted(() => {
     }
 
     fromObject(flow)
-  })
-
-  eventBus.on("getModules", (param) => {
-    if(param === "getModules"){
-      getModules()
-    }
+    removeCursors()
   })
 
   getModules()
@@ -176,6 +171,12 @@ onMounted(() => {
     saveModalVisible.value = true
     modalType.value = "start_collaboration"
     store.commit('changeModalOpened', true)
+  }
+})
+
+eventBus.on("getModules", (param) => {
+  if(param === "getModules"){
+    getModules()
   }
 })
 
@@ -312,6 +313,21 @@ eventBus.on("handleInvite", (params) => {
   sendInviteDecision(params.accept, params.userid, JSON.stringify(toObject()))
 })
 
+
+let removeCursors = () => {
+  let patch = toObject()
+  patch.nodes.forEach((node, i) => {
+    if(node.type === "cursor"){
+      patch.nodes.splice(i, 1)
+    }
+  })
+  fromObject(patch)
+}
+
+eventBus.on("removeCursors", () => {
+  removeCursors()
+})
+
 const downloadPatch = (exportName) => {
   console.log("downloading patch now...")
   download(JSON.stringify(toObject()), exportName + ".json")
@@ -380,10 +396,7 @@ const { onDragOver, onDrop, onDragLeave, initializeId } = useDragAndDrop()
 initDragAndDrop()
 </script>
 <style>
-/* import the necessary styles for Vue Flow to work */
 @import '@vue-flow/core/dist/style.css';
-
-/* import the default theme, this is optional but generally recommended */
 @import '@vue-flow/core/dist/theme-default.css';
 
 .workspace {

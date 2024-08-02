@@ -8,9 +8,9 @@
           <button @click="emitEvent('save patch to file')">save patch to file</button>
           <button @click="emitEvent('load patch from file')">load patch from file</button>
           <span class="divider">Example Patches</span>
-          <button @click="loadSamplepatch('strangerthings')">stranger things</button>
-          <button @click="loadSamplepatch('glockenspiel')">glockenspiel</button>
-          <button @click="loadSamplepatch('melodic_robot')">melodic robot</button>
+          <button @click="loadSamplepatch('strangerthings')" :disabled="store().state.websocketConnected">stranger things</button>
+          <button @click="loadSamplepatch('glockenspiel')" :disabled="store().state.websocketConnected">glockenspiel</button>
+          <button @click="loadSamplepatch('melodic_robot')" :disabled="store().state.websocketConnected">melodic robot</button>
         </div>
       </div>
       <div class="category">
