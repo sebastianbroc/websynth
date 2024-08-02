@@ -6,6 +6,7 @@ export default createStore({
     modalOpened: false,
     websocketConnected: false,
     sessionID: null,
+    userID: null,
     error: null,
     info: null,
     notifications: [],
@@ -25,6 +26,9 @@ export default createStore({
     },
     changeSessionID(state, p) {
       state.sessionID = p
+    },
+    changeUserID(state, p){
+      state.userID = p
     },
     changeError(state, p) {
       state.error = p

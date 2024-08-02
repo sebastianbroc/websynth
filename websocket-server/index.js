@@ -16,10 +16,11 @@ wss.on('connection', function connection(ws) {
             switch(data.msg){
                 case "new session":
                     let newSessionID = makeid(5)
+                    let newUserID = makeUserid(10)
                     console.log("\x1b[32m creating new session with id \x1b[34m" + newSessionID + "\x1b[32m");
 
-                    sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [{'ws': ws, 'username': data.username ?? null, 'userid': makeUserid(10)}], "waiting": [] ,"patch": data.patch})
-                    ws.send(JSON.stringify({"session_id": newSessionID}))
+                    sessions.push({"id": newSessionID, "password_protected": !!data.password, "password": data.password ?? null, "users": [{'ws': ws, 'username': data.username ?? null, 'userid': newUserID}], "waiting": [] ,"patch": data.patch})
+                    ws.send(JSON.stringify({"session_id": newSessionID, "user_id": newUserID, "username": data.username}))
                     break;
                 case "join session":
                     if(sessions.filter(s => s.id === data.id).length === 0){
@@ -68,11 +69,10 @@ wss.on('connection', function connection(ws) {
                     let invitee = currSession.waiting.filter(w => w.userid === data.userid)[0]
                     currSession.patch = data.patch
 
-                    invitee.ws.send(JSON.stringify({"acceptance_status": data.accept === true ? 'y' : 'n', "acceptance_patch": data.accept === true ? currSession.patch : null, "joined_session_id": currSession.id}))
+                    invitee.ws.send(JSON.stringify({"acceptance_status": data.accept === true ? 'y' : 'n', "acceptance_patch": data.accept === true ? currSession.patch : null, "joined_session_id": currSession.id, "user_id": invitee.userid, "username": invitee.username}))
 
                     currSession.waiting.splice(currSession.waiting.indexOf(invitee), 1)
                     promptNewUser(currSession, currSession.waiting)
-                    console.log(data.accept)
                     if(data.accept === true) currSession.users.push(invitee)
 
                     break;

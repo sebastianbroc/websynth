@@ -1,5 +1,6 @@
 import {inject, ref} from "vue";
 import {useStore} from "vuex";
+import debounce from "debounce";
 
 export default function useWebsocket() {
     let socket = null
@@ -10,6 +11,7 @@ export default function useWebsocket() {
 
     function startConnection(callback){
         socket = new WebSocket("ws://localhost:8085")
+        //socket = new WebSocket("wss://websynth-websocket-server-8571bc9cbcfe.herokuapp.com")
 
         socket.onopen = () => {
             callback()
@@ -30,11 +32,11 @@ export default function useWebsocket() {
         socket.send(JSON.stringify({msg: "join session", id: id, password: pass, username: username}))
     }
 
-    let sendChange = (change, type) => {
+    let sendChange = debounce((change, type) => {
         if(socket){
             socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change), type: type}))
         }
-    }
+    }, 0)
 
     function sendInviteDecision(accept, id, patch){
         socket.send(JSON.stringify({msg: "inviteDecision", accept: accept, userid: id, patch: patch}))
@@ -48,10 +50,14 @@ export default function useWebsocket() {
             data = {}
         }
 
+        console.log(data)
+
 
         if(data.session_id){
             store.commit('changeWebsocketConnected', true)
             store.commit('changeSessionID', data.session_id)
+            store.commit('changeUserID', data.user_id)
+            eventBus.emit("init_user", {"username": data.username, "user_id": data.user_id})
 
             if(data.patch){
                 console.log("received initial patch")
@@ -68,7 +74,9 @@ export default function useWebsocket() {
             if(data.acceptance_status === "y"){
                 store.commit('changeWebsocketConnected', true)
                 store.commit('changeSessionID', data.joined_session_id)
+                store.commit("changeUserID", data.user_id)
                 eventBus.emit("element_update", data.acceptance_patch)
+                eventBus.emit("init_user", {"username": data.username, "user_id": data.user_id})
             } else {
                 store.commit('changeError', "Your request to join the session " + data.joined_session_id + " has been declined.")
                 store.commit('changeInfo', null)

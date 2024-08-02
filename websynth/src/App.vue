@@ -65,6 +65,10 @@ body {
   z-index: 1001 !important;
 }
 
+.vue-flow__node-cursor {
+  z-index: 1002 !important;
+}
+
 .controls {
   display: flex;
   flex-direction: column;

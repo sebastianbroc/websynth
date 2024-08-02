@@ -10,6 +10,7 @@
           <span class="divider">Example Patches</span>
           <button @click="loadSamplepatch('strangerthings')">stranger things</button>
           <button @click="loadSamplepatch('glockenspiel')">glockenspiel</button>
+          <button @click="loadSamplepatch('melodic_robot')">melodic robot</button>
         </div>
       </div>
       <div class="category">

@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <NavBar></NavBar>
-    <p id="audioNodeList">{{audioNodeList}}</p>
+    <!--<p id="audioNodeList">{{audioNodeList}}</p>-->
     <WorkSpace @updateElements="updateElements" @elementChanges="handleChanges"></WorkSpace>
   </div>
 </template>
@@ -120,11 +120,11 @@ export default {
                     sourceModule.connect(targetAudioNode.module)
                   } else {
                     if(target.targetHandle.includes("prop")){
-                      console.log("connecting to " + target.targetHandle.substring(5))
-
                       if(source.handleBounds.source[0].id.includes("out") && source.handleBounds.source[0].id.substring(4) === "audio"){
+                        //input signal is audio, so connect to gain node so that intensity is controllable
                         sourceModule.connect(targetAudioNode.cvControls[target.targetHandle.substring(5)])
                       } else {
+                        //input "signal" takes direct control of the parameter, so connect directly to it and ignore the gain node
                         sourceModule.connect(targetAudioNode.module[target.targetHandle.substring(5)])
                       }
                       try{
@@ -242,8 +242,6 @@ export default {
             if(isNewNode){
               Node = this.audioContext.createOscillator()
               cvControls = this.buildCVControls(Node, ["frequency", "detune"])
-              //cvControls = {"frequency": this.audioContext.createGain()}
-              //cvControls.frequency.connect(Node.frequency)
             }
             if(module.data.frequency && Node.frequency){
               Node.frequency.value = module.data.frequency

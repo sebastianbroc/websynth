@@ -1,6 +1,5 @@
 <template>
-  <div class="workspace" @drop="getModules([onDrop($event)], 'create');">
-    <button @click="updateCursorPosition('2')" style="display: none;">Update</button>
+  <div class="workspace" @drop="getModules([onDrop($event)], 'create');" @mouseover="printMousePos" @mousemove="printMousePos">
     <NotificationCenter></NotificationCenter>
     <ModuleBar></ModuleBar>
     <SaveModal :visible="saveModalVisible" :type="modalType" :session="querySession"></SaveModal>
@@ -58,6 +57,7 @@ import SaveModal from "@/components/SaveModal.vue";
 import {ref, markRaw, onMounted, inject} from 'vue';
 import {useStore} from 'vuex';
 import {set, get} from 'idb-keyval'
+import debounce from "debounce";
 import useDragAndDrop from '@/mixins/useDnD'
 import useWebsocket from "@/mixins/websocketHandler";
 import OscillatorModule from "@/components/synth_modules/OscillatorModule.vue";
@@ -74,7 +74,7 @@ import CommentModule from "@/components/synth_modules/CommentModule.vue";
 const store = useStore()
 import { useRouter } from 'vue-router'
 
-const { toObject, fromObject, onConnect, addEdges, updateNode, applyNodeChanges, applyEdgeChanges } = useVueFlow()
+const { toObject, fromObject, onConnect, addEdges, applyNodeChanges, applyEdgeChanges, screenToFlowCoordinate } = useVueFlow()
 onConnect(addEdges)
 const eventBus = inject("eventBus")
 
@@ -137,6 +137,15 @@ const initial_elements = {
     "zoom": 1
   }
 }
+
+let printMousePos = debounce((event) => {
+  let pos = screenToFlowCoordinate({
+    x: event.clientX,
+    y: event.clientY,
+  })
+  applyNodeChanges([{"id":store.state.userID,"type":"position","dragging":false,"position":{"x":pos.x,"y":pos.y,"z":0}}]);
+  getModules([{id: store.state.userID, type: 'position', position: { x: pos.x, y: pos.y }}], "nodes")
+}, 10)
 
 onMounted(() => {
   get("flow").then(value => {
@@ -257,6 +266,16 @@ eventBus.on("element_update", (elements) => {
   })
 })
 
+eventBus.on("init_user", (user) => {
+  let nodes = toObject()
+  if(!nodes.nodes.find(n => n.id === user.user_id)){
+    nodes.nodes.push({id: user.user_id, type: 'cursor', data: {username: user.username}, position: { x: 500, y: 300 }})
+    fromObject(nodes)
+
+    getModules([{id: user.user_id, type: 'cursor', data: {username: user.username}, position: { x: 500, y: 300 }}], "create")
+  }
+})
+
 eventBus.on("node_change", (change) => {
   let nodes = null
   switch(change.type){
@@ -292,10 +311,6 @@ eventBus.on("node_change", (change) => {
 eventBus.on("handleInvite", (params) => {
   sendInviteDecision(params.accept, params.userid, JSON.stringify(toObject()))
 })
-
-const updateCursorPosition = (id) => {
-  updateNode(id, {position: {x: 300, y: 400}})
-}
 
 const downloadPatch = (exportName) => {
   console.log("downloading patch now...")
