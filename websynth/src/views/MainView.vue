@@ -7,6 +7,10 @@
 </template>
 
 <script>
+// This is the Main View of this SPA. It also handles everything audio-related and integrates the Web Audio API.
+// The array of frontend modules gets synchronized with the audio context here. (mainly by handleNodeList and buildConnection)
+
+// ---------- SETUP ---------- //
 import WorkSpace from "@/components/WorkSpace.vue";
 import NavBar from "@/components/NavBar.vue";
 import EnvelopeGenerator from '@/mixins/envelopeGenerator'
@@ -148,7 +152,6 @@ export default {
             }
           }
         } catch(e) {
-          console.error(e)
           //do nothing
         }
       } else {

@@ -1,5 +1,5 @@
 <template>
-  <div class="workspace" @drop="getModules([onDrop($event)], 'create');" @mouseover="printMousePos" @mousemove="printMousePos">
+  <div class="workspace" @drop="getModules([onDrop($event)], 'create');" @mouseover="updateMousePos" @mousemove="updateMousePos">
     <NotificationCenter></NotificationCenter>
     <ModuleBar></ModuleBar>
     <SaveModal :visible="saveModalVisible" :type="modalType" :session="querySession"></SaveModal>
@@ -45,6 +45,11 @@
 </template>
 
 <script setup>
+// This component is the main workspace of the application.
+// It handles the frontend-side of the modules and talks to MainView.vue to integrate changes in the audio context.
+
+
+// ---------- SETUP ---------- //
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { MiniMap } from '@vue-flow/minimap'
@@ -73,22 +78,18 @@ import MidiModule from "@/components/synth_modules/MidiModule.vue";
 import CommentModule from "@/components/synth_modules/CommentModule.vue";
 const store = useStore()
 import { useRouter } from 'vue-router'
-
 const { toObject, fromObject, onConnect, addEdges, applyNodeChanges, applyEdgeChanges, screenToFlowCoordinate } = useVueFlow()
 onConnect(addEdges)
 const eventBus = inject("eventBus")
-
-let vueFlowInstance = null;
-
 let {startConnection, createSession, joinSession, sendChange, closeSession, sendInviteDecision} = useWebsocket()
 let router = useRouter()
-
 // eslint-disable-next-line no-undef
 const emit = defineEmits(['updateElements', 'triggerModule', 'elementChanges'])
 const saveModalVisible = ref(false)
 const modalType = ref("")
 const querySession = ref(router.currentRoute.value.query.session)
 
+let vueFlowInstance = null;
 const nodeTypes = {
   oscillator: markRaw(OscillatorModule),
   output: markRaw(OutputModule),
@@ -138,7 +139,7 @@ const initial_elements = {
   }
 }
 
-let printMousePos = debounce((event) => {
+let updateMousePos = debounce((event) => {
   let pos = screenToFlowCoordinate({
     x: event.clientX,
     y: event.clientY,
@@ -164,15 +165,95 @@ onMounted(() => {
     fromObject(flow)
     removeCursors()
   })
-
   getModules()
 
   if(router.currentRoute.value.query.session){
+    //open modal to join session if session code is present in query
     saveModalVisible.value = true
     modalType.value = "start_collaboration"
     store.commit('changeModalOpened', true)
   }
 })
+
+// ---------- FUNCTIONS ---------- //
+let removeCursors = () => {
+  let patch = toObject()
+  patch.nodes.forEach((node, i) => {
+    if(node.type === "cursor"){
+      patch.nodes.splice(i, 1)
+    }
+  })
+  fromObject(patch)
+}
+
+const downloadPatch = (exportName) => {
+  console.log("downloading patch now...")
+  download(JSON.stringify(toObject()), exportName + ".json")
+}
+
+const setInstance = (instance) => {
+  console.log("instance has been set")
+  vueFlowInstance = instance
+  getModules()
+}
+const getModules = (changes, type) => {
+  if (vueFlowInstance) {
+    let elements = vueFlowInstance.getElements
+    emit('updateElements', elements)
+    set("flow", JSON.stringify(toObject()))
+
+    if(changes && Array.isArray(changes)){
+      changes.forEach(change => {
+        emit('elementChanges', elements._value.find(e => e.id === change.id))
+
+        if(store.state.websocketConnected){
+          sendChange(change, type)
+        }
+      })
+    }
+  }
+}
+
+const clockTrigger = (id) => {
+  if(vueFlowInstance && getModuleChildren(id).length > 0 && getModuleChildren(id)[0].targetNode){
+    getModuleChildren(id).forEach(child => {
+      eventBus.emit("triggerModule", child.targetNode.id)
+    })
+  }
+}
+
+const advanceStep = (module) => {
+  if (vueFlowInstance) {
+    let elements = vueFlowInstance.getElements
+    emit('elementChanges', elements._value.find(e => e.id === module[0].id))
+  }
+}
+
+const initDragAndDrop = () => {
+  get("flow").then(value => {
+    let flow = null
+    if(typeof value !== "undefined"){
+      flow = JSON.parse(value)
+    } else {
+      console.log("created initial elements")
+      flow = initial_elements
+    }
+    let max = flow.nodes.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
+    max = Math.max(...max)
+    initializeId(max === -Infinity ? 0 : max + 1)
+  })
+}
+
+const getModuleChildren = (id) => {
+  //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
+  let elements = vueFlowInstance.getElements._value
+  return elements.filter(m => m.type == "default" && m.sourceNode.id === id)
+}
+
+const { onDragOver, onDrop, onDragLeave, initializeId } = useDragAndDrop()
+initDragAndDrop()
+
+// ---------- EVENT BUS  ---------- //
 
 eventBus.on("getModules", (param) => {
   if(param === "getModules"){
@@ -218,7 +299,6 @@ eventBus.on("loadSamplepatch", (patchname) => {
       getModules()})
     })
 })
-
 
 eventBus.on("modal-click-cancel", () => {
   saveModalVisible.value = false
@@ -313,87 +393,9 @@ eventBus.on("handleInvite", (params) => {
   sendInviteDecision(params.accept, params.userid, JSON.stringify(toObject()))
 })
 
-
-let removeCursors = () => {
-  let patch = toObject()
-  patch.nodes.forEach((node, i) => {
-    if(node.type === "cursor"){
-      patch.nodes.splice(i, 1)
-    }
-  })
-  fromObject(patch)
-}
-
 eventBus.on("removeCursors", () => {
   removeCursors()
 })
-
-const downloadPatch = (exportName) => {
-  console.log("downloading patch now...")
-  download(JSON.stringify(toObject()), exportName + ".json")
-}
-
-const setInstance = (instance) => {
-  console.log("instance has been set")
-  vueFlowInstance = instance
-  getModules()
-}
-const getModules = (changes, type) => {
-  if (vueFlowInstance) {
-    let elements = vueFlowInstance.getElements
-    emit('updateElements', elements)
-    set("flow", JSON.stringify(toObject()))
-
-    if(changes && Array.isArray(changes)){
-      changes.forEach(change => {
-        emit('elementChanges', elements._value.find(e => e.id === change.id))
-
-        if(store.state.websocketConnected){
-          sendChange(change, type)
-        }
-      })
-    }
-  }
-}
-
-const clockTrigger = (id) => {
-  if(vueFlowInstance && getModuleChildren(id).length > 0 && getModuleChildren(id)[0].targetNode){
-    getModuleChildren(id).forEach(child => {
-      eventBus.emit("triggerModule", child.targetNode.id)
-    })
-  }
-}
-
-const advanceStep = (module) => {
-  if (vueFlowInstance) {
-    let elements = vueFlowInstance.getElements
-    emit('elementChanges', elements._value.find(e => e.id === module[0].id))
-  }
-}
-
-const initDragAndDrop = () => {
-  get("flow").then(value => {
-    let flow = null
-    if(typeof value !== "undefined"){
-      flow = JSON.parse(value)
-    } else {
-      console.log("created initial elements")
-      flow = initial_elements
-    }
-    let max = flow.nodes.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
-    max = Math.max(...max)
-    initializeId(max === -Infinity ? 0 : max + 1)
-  })
-}
-
-const getModuleChildren = (id) => {
-  //m.type == "default" is used to search in edges (connections between modules) which are part of the elements array
-  let elements = vueFlowInstance.getElements._value
-  return elements.filter(m => m.type == "default" && m.sourceNode.id === id)
-}
-
-const { onDragOver, onDrop, onDragLeave, initializeId } = useDragAndDrop()
-initDragAndDrop()
 </script>
 <style>
 @import '@vue-flow/core/dist/style.css';
