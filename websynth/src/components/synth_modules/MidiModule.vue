@@ -15,8 +15,8 @@
       <div class="control_row" v-if="midiDevice">
         <span>{{midiData ? 'Data: ' +  midiData : "No Data Received yet"}}</span>
       </div>
-      <div class="control_row" v-if="midiNote">
-        <span>Note: {{midiNote}} {{node.data.frequency}}Hz</span>
+      <div class="control_row">
+        <span v-if="midiNote">Note: {{midiNote}} {{node.data.frequency}}Hz</span>
       </div>
       <div class="divider_row"></div>
       <div class="control_row">
@@ -96,6 +96,7 @@ let onMIDIMessage = (event) => {
     let convertedValue = noteConverter.convert(event.data[1])
     midiNote.value = convertedValue.note
     node.data.frequency = convertedValue.frequency
+    emitChange()
   }
 }
 
@@ -136,6 +137,10 @@ export default {
 }
 </script>
 <style scoped>
+.synth_module {
+  width: 200px;
+}
+
 .controls {
   display: flex;
   flex-direction: column;

@@ -205,7 +205,6 @@ const getModules = (changes, type) => {
     if(changes && Array.isArray(changes)){
       changes.forEach(change => {
         emit('elementChanges', elements._value.find(e => e.id === change.id))
-
         if(store.state.websocketConnected){
           sendChange(change, type)
         }
@@ -238,6 +237,7 @@ const initDragAndDrop = () => {
       console.log("created initial elements")
       flow = initial_elements
     }
+    //make sure the id of new elements starts after the highest id currently present
     let max = flow.nodes.map(e => {return parseInt(e.id.substring(8))}).filter(e => !isNaN(e))
     max = Math.max(...max)
     initializeId(max === -Infinity ? 0 : max + 1)
