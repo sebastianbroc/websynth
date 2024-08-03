@@ -34,6 +34,7 @@ export default function useWebsocket() {
 
     let sendChange = debounce((change, type) => {
         if(socket){
+            //console.log({msg: "change element", element: JSON.stringify(change), type: type})
             socket.send(JSON.stringify({msg: "change element", element: JSON.stringify(change), type: type}))
         }
     }, 0)
@@ -51,6 +52,7 @@ export default function useWebsocket() {
         }
 
         if(data.session_id){
+            //Joined the Session
             store.commit('changeWebsocketConnected', true)
             store.commit('changeSessionID', data.session_id)
             store.commit('changeUserID', data.user_id)
@@ -64,6 +66,7 @@ export default function useWebsocket() {
             store.commit('changeError', data.error)
             socket.close()
         } else if (data.info){
+            //Waiting for confirmation by other users...
             store.commit("changeInfo", data.info)
         } else if (data.acceptNewUser) {
             store.commit("changeNotifications", data.acceptNewUser.map(u => {return {...u, "type": "acceptNewUser"}}))

@@ -63,6 +63,8 @@ export default {
     },
     loadSamplepatch(patchname){
       this.eventBus.emit("loadSamplepatch", patchname)
+      this.eventBus.emit("navBar-click", "pause playback")
+      this.playing = false;
     },
     hideOtherMenus(e){
       let elements = document.querySelectorAll(".category a")

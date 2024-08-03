@@ -66,7 +66,7 @@
     </div>
     <div class="modal start_collaboration_modal" :class="{visible: visible && type === 'start_collaboration' && store().state.sessionID && collaboration_type === 'create'}">
       <h2>Your Session has been successfully created!</h2>
-      <p>Your Session ID is: <b>{{store().state.sessionID}}</b></p>
+      <p>Your Session ID is: <b @click="copyText(store().state.sessionID)">{{store().state.sessionID}}</b></p>
       <p>Use this link to invite collaborators: <i><a :href="'https://sebastianbroc.github.io/websynth/?session=' + store().state.sessionID">{{"https://sebastianbroc.github.io/websynth/?session=" + store().state.sessionID}}</a></i></p>
       <div class="buttonWrapper">
         <button @click="emitEvent('cancel', true)" class="finish">start patching</button>
@@ -139,6 +139,9 @@ export default {
       };
       reader.readAsText(file);
     },
+    copyText(text) {
+        navigator.clipboard.writeText(text);
+    },
     resetFields(){
       this.username = null
       this.patch = null
@@ -175,6 +178,14 @@ export default {
     margin: 0;
     font-weight: normal;
     font-family: monospace;
+  }
+
+  b {
+    cursor: pointer;
+  }
+
+  b:hover {
+    background: var(--lighten);
   }
 
   #patchname, .file-ending, input {

@@ -80,6 +80,7 @@ eventBus.on('remountModules', () => {
 
 let togglePause = () => {
   node.data.paused = !node.data.paused;
+  emitChange();
   trigger()
 }
 
