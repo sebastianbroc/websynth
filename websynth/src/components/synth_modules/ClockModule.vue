@@ -55,9 +55,11 @@ const knobOptions = {
 }
 
 let triggered = ref(false)
+let timeouts = ref([])
 
 onMounted(() => {
   mount()
+  timeoutHandler()
 })
 
 let mount = () => {
@@ -81,16 +83,27 @@ eventBus.on('remountModules', () => {
 let togglePause = () => {
   node.data.paused = !node.data.paused;
   emitChange();
-  trigger()
+  timeoutHandler()
 }
 
 let trigger = () => {
-  if(!node.data.paused){
+  if(!node.data.paused && timeouts.value.length === 0){
     triggered.value = true
     setTimeout(turnOffTriggered, 100)
+    timeouts.value.push(setTimeout(timeoutHandler, node.data.interval))
     emitTrigger()
-    setTimeout(trigger, node.data.interval)
   }
+}
+
+let timeoutHandler = () => {
+  clearTimeouts()
+  trigger()
+}
+
+let clearTimeouts = () => {
+  timeouts.value.forEach((to, i) => {
+    timeouts.value.splice(i, 1)
+  })
 }
 
 let turnOffTriggered = () => {

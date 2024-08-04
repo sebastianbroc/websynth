@@ -44,7 +44,7 @@
         <span>intensity</span>
         <div class="control_row">
           <input type="number" min="0" v-model="node.data.intensity" v-on:input="emitChange" v-if="store.state.inputType === 'text'">
-          <ControlKnob v-model="node.data.intensity" :options="knobOptions" v-if="store.state.inputType === 'knob'"></ControlKnob>
+          <ControlKnob v-model="node.data.intensity" :options="{...knobOptions, minValue: 1}" v-if="store.state.inputType === 'knob'"></ControlKnob>
         </div>
       </div>
       <div class="divider_row"></div>
