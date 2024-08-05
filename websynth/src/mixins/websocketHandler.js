@@ -10,7 +10,7 @@ export default function useWebsocket() {
     const socketConnected = ref(false)
 
     function startConnection(callback){
-        socket = new WebSocket("ws://localhost:8085")
+        socket = new WebSocket("ws://localhost:8081")
         //socket = new WebSocket("wss://websynth-websocket-server-8571bc9cbcfe.herokuapp.com")
 
         socket.onopen = () => {

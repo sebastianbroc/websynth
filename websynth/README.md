@@ -1,24 +1,28 @@
-# websynth
+# Docker-Deployment
+### Frontend Docker-Container starten:
+```
+docker build -t websynth .
+docker run -t -p 8080:80 websynth
+```
 
-## Project setup
+### Websocket-Server starten:
+Im Ordner "websocket-server"
+```
+docker build -t websocket-server .
+docker run -t -p 8081:8085 websocket-server
+```
+
+
+# Entwicklungsumgebung
+### Frontend
 ```
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Websocket-Server
+Im Ordner "websocket-server"
 ```
-npm run build
+npm install
+node index.js
 ```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

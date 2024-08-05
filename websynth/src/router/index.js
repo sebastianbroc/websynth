@@ -10,7 +10,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.NODE_ENV === "production" ? "/websynth/" : "/"),
+  history: createWebHistory("/"),
   routes
 })
 
