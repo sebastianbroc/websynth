@@ -1,8 +1,10 @@
 # Willkommen!
 <img width="300" align="right" src="https://github.com/sebastianbroc/websynth/assets/63352229/8a731d5a-95dc-42da-81fe-cc67ab6baa50"> 
+
 Willkommen im GitHub-Repository des modularen, web-basierten Synthesizers <b>"Websynth"</b>. Diese Webanwendung entstand im Rahmen meiner Masterarbeit mit dem Thema "Explorative Konzeption und Implementierung einer Web-basierten Plattform zur musikalischen Echtzeit-Kollaboration an Modular-Synthesizern" im Sommersemester 2024 im Studiengang Medieninformatik an der TH Köln.
 
 Das Projekt wird von [Prof. Christian Noss](https://www.th-koeln.de/personen/christian.noss/) und [Prof. Dr. Christian Faubel](https://www.th-koeln.de/personen/christian.faubel/) betreut.
+
 <br clear="both">
 
 
@@ -23,8 +25,13 @@ Das System ist via GitHub Pages unter diesem Link verfügbar: https://sebastianb
 
 Unter dem Menüpunkt "patch" können Beispiel-Patches geladen werden, um einen Ausgangspunkt zu erhalten, falls dir Modular-Synthesizer grundsätzlich neu sind.
 
+Anweisungen, um das System via Docker-Containern oder zur Entwicklung zu hosten, befinden sich in der [README-Datei des Frontends](https://github.com/sebastianbroc/websynth/tree/main/websynth#readme). 
+
 
 ## Beispiel-Videos
 [Performance-Video 01](https://youtu.be/sP62KJTY43U)
 
 [Performance-Video 02](https://youtu.be/TH50pn13A24)
+
+# Kontakt
+sebastian.brock@smail.th-koeln.de oder sebastian.brock@outlook.de
